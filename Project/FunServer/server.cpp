@@ -24,7 +24,12 @@ void Server::onNewConnection()
 {
     QTcpSocket *socket = tcpServer->nextPendingConnection();
     qDebug() << "New client connected";
-    if(client1)
+    if (!client1)
+        client1 = new Client(socket, this);
+    else if (!client2)
         client2 = new Client(socket, this);
-    client1 = new Client(socket, this);
+    else
+    {
+        socket->disconnectFromHost();
+    }
 }

@@ -9,8 +9,8 @@ public:
     explicit Server(QObject *parent = nullptr);
     bool start(quint16 port);
 
-    Client* client1;
-    Client* client2;
+    Client* client1 = nullptr;
+    Client* client2 = nullptr;
 
 private slots:
     void onNewConnection();

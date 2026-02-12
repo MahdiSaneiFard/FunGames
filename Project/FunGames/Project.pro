@@ -15,6 +15,7 @@ SOURCES += \
     loginwindow.cpp \
     main.cpp \
     mainwindow.cpp \
+    othello_window.cpp \
     player.cpp
 
 HEADERS += \
@@ -22,6 +23,7 @@ HEADERS += \
     GameOptions.h \
     loginwindow.h \
     mainwindow.h \
+    othello_window.h \
     player.h
 
 FORMS += \

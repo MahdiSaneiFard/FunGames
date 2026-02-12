@@ -12,8 +12,24 @@ Client::Client(QTcpSocket *s, QObject *parent)
             this, &Client::onDisconnected);
 }
 
+void Client::sendMessageToServer(const QString &text)
+{
+    QJsonObject msg;
+    msg["type"] = "chat";
+    msg["message"] = text;
+
+    QJsonDocument doc(msg);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+    data.append('\n');
+
+    socket->write(data);
+    socket->flush();
+}
+
+
 void Client::onReadyRead()
 {
+    qDebug() << "Data arrived!";
     buffer.append(socket->readAll());
 
     while (true) {
@@ -46,6 +62,8 @@ void Client::sendMessage(const QJsonObject &msg)
 
 void Client::processMessage(const QJsonObject &msg)
 {
+    qDebug() << "Full message received:" << msg;
+
     QString type = msg["type"].toString();
     qDebug() << "Message type:" << type;
 
@@ -54,6 +72,17 @@ void Client::processMessage(const QJsonObject &msg)
         QString assignedRole = msg["role"].toString(); // "host" یا "guest"
         this->role = assignedRole;
         qDebug() << "Assigned role:" << assignedRole;
+    }
+
+    if(type == "test")  // ← پیام تستی
+    {
+        QString message = msg["message"].toString();
+        qDebug() << "Message content:" << message;
+    }
+
+    if(type == "chat") {
+        QString text = msg["message"].toString();
+        qDebug() << "Client said:" << text;
     }
 }
 

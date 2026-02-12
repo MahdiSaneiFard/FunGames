@@ -12,7 +12,9 @@ CONFIG += c++17 cmdline
 SOURCES += \
         Client.cpp \
         Server.cpp \
-        main.cpp
+        game.cpp \
+        main.cpp \
+        othellogame.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -21,4 +23,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     Client.h \
-    Server.h
+    Server.h \
+    game.h \
+    othellogame.h
