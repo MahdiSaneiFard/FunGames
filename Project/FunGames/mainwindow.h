@@ -39,8 +39,6 @@ private slots:
 
     void on_ConnectToHostPushButton_clicked();
 
-    void updateGamesTable(const QVector<GameOptions> &games);
-
     void onMessageReceived(QJsonObject msg);
 
     void on_guestRadioButton_clicked();

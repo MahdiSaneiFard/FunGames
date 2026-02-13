@@ -2,4 +2,8 @@
     <qresource prefix="/icons">
         <file>resources/icons/icon.png</file>
     </qresource>
+    <qresource prefix="/pices">
+        <file>resources/pices/whiteP.png</file>
+        <file>resources/pices/blackP.png</file>
+    </qresource>
 </RCC>

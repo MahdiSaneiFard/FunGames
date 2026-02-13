@@ -13,7 +13,10 @@ class ConnectFourWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit ConnectFourWindow(QWidget *parent = nullptr);
+    explicit ConnectFourWindow(int time,QString Collor ,QWidget *parent = nullptr);
+    QString color;
+    int matchTime;
+
     ~ConnectFourWindow();
     void endGame();
 

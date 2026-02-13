@@ -2,8 +2,8 @@
 #include "ui_connectfourwindow.h"
 #include <QJsonObject>
 
-ConnectFourWindow::ConnectFourWindow(QWidget *parent)
-    : QMainWindow(parent)
+ConnectFourWindow::ConnectFourWindow(int time,QString Collor ,QWidget *parent) : QMainWindow(parent), color(Collor),
+        matchTime(time)
     , ui(new Ui::ConnectFourWindow)
 {
     ui->setupUi(this);
