@@ -335,12 +335,9 @@ void MainWindow::on_Aply_btn_clicked()
 }
 void MainWindow::onMessageReceived(QJsonObject msg)
 {
-    qDebug() << msg["type"].toString() << msg["timelimit"].toInt() << msg["hostColor"].toString();
-
     QString type = msg["type"].toString();
     if(type == "create_match")
     {
-        QMessageBox::warning(this, "ERROR", msg["hostColor"].toString() + msg["game"].toString());
         QString newGameMode = msg["game"].toString();
         QString hostColor = msg["hostColor"].toString();
         int matchTime = msg["timeLimit"].toInt();
@@ -355,6 +352,18 @@ void MainWindow::onMessageReceived(QJsonObject msg)
         table->setItem(row, 0, new QTableWidgetItem(newGameMode));
         table->setItem(row, 1, new QTableWidgetItem(hostColor));
         table->setItem(row, 2, new QTableWidgetItem(QString::number(matchTime)));
+    }
+    else if(type == "othello")
+    {
+        emit OthelloMSG(msg);
+    }
+    else if(type == "connectFour")
+    {
+        emit ConnectFourMSG(msg);
+    }
+    else if(type == "checkers")
+    {
+        emit CheckersMSG(msg);
     }
 
 }
@@ -481,16 +490,41 @@ void MainWindow::on_JoinPushButton_clicked()
     msg1["hostColor"] = hostColor;
     msg1["timeLimit"] = matchTime;
 
+    if(gameMode == "othello"){
+        client->sendMessage(msg1);
+        OthelloWindow* othellowindow = new OthelloWindow();
 
-    client->sendMessage(msg1);
-    OthelloWindow* othellowindow = new OthelloWindow();
 
-    connect(othellowindow, &OthelloWindow::gameFinished, this, [=]() {
-        this->show();          // برگشت به لابی
-        othellowindow->deleteLater();
-    });
+        connect(othellowindow, &OthelloWindow::othelloFinished, this, [=]() {
+            this->show();          // برگشت به لابی
+            othellowindow->deleteLater();
+        });
 
-    othellowindow->show();
-    this->hide();
+        othellowindow->show();
+        connect(othellowindow, &OthelloWindow::sendMessage, this, &MainWindow::sendGameMessage);
+        connect(this, &MainWindow::OthelloMSG,othellowindow, &OthelloWindow::prossesMessage);
+        this->hide();
+    }
+    else if(gameMode == "connectFour")
+    {
+        client->sendMessage(msg1);
+        ConnectFourWindow* connectFourWindow = new ConnectFourWindow();
+
+
+        connect(connectFourWindow, &ConnectFourWindow::conncetFourFinished, this, [=]() {
+            this->show();          // برگشت به لابی
+            connectFourWindow->deleteLater();
+        });
+
+        connectFourWindow->show();
+        connect(connectFourWindow, &ConnectFourWindow::sendMessage, this, &MainWindow::sendGameMessage);
+        connect(this, &MainWindow::ConnectFourMSG,connectFourWindow, &ConnectFourWindow::prossesMessage);
+        this->hide();
+    }
+}
+
+void MainWindow::sendGameMessage(QJsonObject msg)
+{
+    client->sendMessage(msg);
 }
 

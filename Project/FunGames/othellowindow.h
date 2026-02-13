@@ -2,6 +2,7 @@
 #define OTHELLOWINDOW_H
 
 #include <QMainWindow>
+#include <QJsonObject>
 
 namespace Ui {
 class OthelloWindow;
@@ -17,12 +18,14 @@ public:
     ~OthelloWindow();
 
 
-private slots:// protocol jadid ro begir ke daram bara input: type game - > game name siganl miad in ja
-//
+public slots:// protocol jadid ro begir ke daram bara input: type game - > game name siganl miad in ja
+    void prossesMessage(QJsonObject);
 
 
 signals:
-    void gameFinished();
+    void othelloFinished();
+    void sendMessage(QJsonObject msg);
+
 
 private:
     Ui::OthelloWindow *ui;

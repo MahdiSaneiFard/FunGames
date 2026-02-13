@@ -2,6 +2,7 @@
 #define CONNECTFOURWINDOW_H
 
 #include <QMainWindow>
+#include <QJsonObject>
 
 namespace Ui {
 class ConnectFourWindow;
@@ -14,6 +15,17 @@ class ConnectFourWindow : public QMainWindow
 public:
     explicit ConnectFourWindow(QWidget *parent = nullptr);
     ~ConnectFourWindow();
+    void endGame();
+
+
+public slots:// protocol jadid ro begir ke daram bara input: type game - > game name siganl miad in ja
+    void prossesMessage(QJsonObject);
+
+
+signals:
+    void conncetFourFinished();
+    void sendMessage(QJsonObject msg);
+
 
 private:
     Ui::ConnectFourWindow *ui;

@@ -19,6 +19,10 @@ class MainWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+signals:
+    void OthelloMSG(QJsonObject msg);
+    void ConnectFourMSG(QJsonObject msg);
+    void CheckersMSG(QJsonObject msg);//?
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -29,6 +33,7 @@ private slots:
 
     void on_Aply_btn_clicked();
 
+    void sendGameMessage(QJsonObject msg);
 
     void on_CreatePushButton_clicked();
 

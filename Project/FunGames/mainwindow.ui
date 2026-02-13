@@ -365,10 +365,10 @@
           <item>
            <widget class="QStackedWidget" name="stackedWidget">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>2</number>
             </property>
             <widget class="QWidget" name="page">
              <layout class="QHBoxLayout" name="horizontalLayout_24">
@@ -400,17 +400,17 @@
                       <widget class="QComboBox" name="gameModeComboBox">
                        <item>
                         <property name="text">
-                         <string>Othello</string>
+                         <string>othello</string>
                         </property>
                        </item>
                        <item>
                         <property name="text">
-                         <string>Checkers</string>
+                         <string>checkers</string>
                         </property>
                        </item>
                        <item>
                         <property name="text">
-                         <string>Connect Four</string>
+                         <string>connectFour</string>
                         </property>
                        </item>
                       </widget>
@@ -509,7 +509,7 @@
               <item>
                <widget class="QGroupBox" name="groupBox_2">
                 <property name="enabled">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                 <property name="title">
                  <string>GroupBox</string>
@@ -527,7 +527,7 @@
                    <item>
                     <widget class="QTableWidget" name="activeMatchesTableWidget">
                      <property name="enabled">
-                      <bool>true</bool>
+                      <bool>false</bool>
                      </property>
                     </widget>
                    </item>
