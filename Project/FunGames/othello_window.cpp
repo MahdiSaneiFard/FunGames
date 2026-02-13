@@ -1,7 +1,7 @@
 #include "othello_window.h"
 #include <QVBoxLayout>
 #include <QLabel>
-
+/*
 OthelloWindow::OthelloWindow(GameClient* cl, QString role, QWidget *parent)
     : QWidget(parent), client(cl), myRole(role) {
 
@@ -87,3 +87,4 @@ void OthelloWindow::updateBoard(const QJsonArray& boardData, QString currentTurn
 void OthelloWindow::setStatus(QString text) {
     statusLabel->setText(text);
 }
+*/

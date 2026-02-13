@@ -18,7 +18,7 @@ private slots:
     void onDisconnected();
 
 signals:
-    void moveReceived(Client* sender, QJsonObject data);
+    //void moveReceived(Client* sender, QJsonObject data);
 
 private:
     QTcpSocket *socket;
@@ -27,4 +27,5 @@ private:
 public:
     void processMessage(const QJsonObject &msg);
     void sendMessage(const QJsonObject &msg);
+    Client* otherClient;
 };

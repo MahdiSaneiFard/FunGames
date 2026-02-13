@@ -10,7 +10,7 @@
 #include "GameClient.h"
 
 class OthelloWindow : public QWidget {
-    Q_OBJECT
+    Q_OBJECT/*
 private:
     QPushButton* cells[8][8];
     QLabel* statusLabel;
@@ -23,7 +23,7 @@ public:
     void setStatus(QString text);
 
 private slots:
-    void onCellClicked();
+    void onCellClicked();*/
 };
 
 #endif

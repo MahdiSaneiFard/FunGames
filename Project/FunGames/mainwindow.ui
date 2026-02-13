@@ -365,10 +365,10 @@
           <item>
            <widget class="QStackedWidget" name="stackedWidget">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="currentIndex">
-             <number>2</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page">
              <layout class="QHBoxLayout" name="horizontalLayout_24">
@@ -451,12 +451,12 @@
                       <widget class="QComboBox" name="colorComboBox">
                        <item>
                         <property name="text">
-                         <string>Red</string>
+                         <string>white</string>
                         </property>
                        </item>
                        <item>
                         <property name="text">
-                         <string>Blue</string>
+                         <string>black</string>
                         </property>
                        </item>
                       </widget>

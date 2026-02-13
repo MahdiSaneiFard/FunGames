@@ -334,13 +334,53 @@ void MainWindow::on_Aply_btn_clicked()
 }
 void MainWindow::onMessageReceived(QJsonObject msg)
 {
+    qDebug() << msg["type"].toString() << msg["timelimit"].toInt() << msg["hostColor"].toString();
+
+    QString type = msg["type"].toString();
+    if(type == "create_match")
+    {
+        qDebug() << msg["type"].toString() << msg["timelimit"].toInt() << msg["hostColor"].toString();
+        QString newGameMode = msg["game"].toString();
+        QString hostColor = msg["hostColor"].toString();
+        int matchTime = msg["timeLimit"].toInt();
+
+        QTableWidget* table = ui->activeMatchesTableWidget;
+
+        // 2️⃣ اضافه کردن ردیف جدید
+        int row = table->rowCount();
+        table->insertRow(row);
+
+        // 3️⃣ پر کردن ستون‌ها با اطلاعات مچ
+        table->setItem(row, 0, new QTableWidgetItem(newGameMode));
+        table->setItem(row, 1, new QTableWidgetItem(hostColor));
+        table->setItem(row, 2, new QTableWidgetItem(QString::number(matchTime)));
+    }
 
 }
 void MainWindow::on_CreatePushButton_clicked()
 {
+    QString currentMode  = ui->gameModeComboBox->currentText();
+    QString currentColor = ui->colorComboBox->currentText();
+    int currentTime      = ui->timeSpinBox->value();
 
+    QTableWidget* table = ui->createdGamesTableWidget;
+
+    int row = table->rowCount();
+    table->insertRow(row);
+
+    table->setItem(row, 0, new QTableWidgetItem(currentMode));
+    table->setItem(row, 1, new QTableWidgetItem(currentColor));
+    table->setItem(row, 2, new QTableWidgetItem(QString::number(currentTime)));
+
+    // ===== پیام به سرور =====
+    QJsonObject msg;
+    msg["type"] = "create_match";
+    msg["game"] = currentMode;
+    msg["hostColor"] = currentColor;
+    msg["timeLimit"] = currentTime;
+
+    client->sendMessage(msg);
 }
-
 void MainWindow::on_ConnectToHostPushButton_clicked()
 {
     QString serverIP = ui->guestLineEdit->text().trimmed();
@@ -387,4 +427,22 @@ void MainWindow::updateGamesTable(const QVector<GameOptions> &games)
     }
 }
 
+
+
+void MainWindow::on_guestRadioButton_clicked()
+{
+    QJsonObject msg1;
+    msg1["type"] = "role";
+    msg1["role"] = "guest";
+    client->sendMessage(msg1);
+}
+
+
+void MainWindow::on_HostRadioButton_clicked()
+{
+    QJsonObject msg1;
+    msg1["type"] = "role";
+    msg1["role"] = "host";
+    client->sendMessage(msg1);
+}
 

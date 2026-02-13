@@ -25,23 +25,25 @@ void Server::onNewConnection()
 {
     QTcpSocket *socket = tcpServer->nextPendingConnection();
     qDebug() << "New client connected";
-    if (!client1)
+    if (!client1)// set nashode nbood
     {
         client1 = new Client(socket, this);
-        connect(client1, &Client::moveReceived, this, [this](Client* s, QJsonObject d){
-            if(activeGame) activeGame->handleMove(s, d);
-        });
+        //connect(client1, &Client::moveReceived, this, [this](Client* s, QJsonObject d){
+          //  if(activeGame) activeGame->handleMove(s, d);
+        //});
     }
     else if (!client2)
     {
-        client2 = new Client(socket, this);
-        connect(client2, &Client::moveReceived, this, [this](Client* s, QJsonObject d){
-            if(activeGame) activeGame->handleMove(s, d);
-        });
+        client2 = new Client(socket, this); // doo ra set
+        client2->otherClient = client1;
+        client1->otherClient = client2;
+       // connect(client2, &Client::moveReceived, this, [this](Client* s, QJsonObject d){
+         //   if(activeGame) activeGame->handleMove(s, d);
+        //});
 
-        activeGame = new OthelloGame();
-        activeGame->assignRoles(client1, client2, "black");
-        activeGame->startGame();
+       // activeGame = new OthelloGame();
+        //activeGame->assignRoles(client1, client2, "black");
+        //activeGame->startGame();
     }
     else
     {

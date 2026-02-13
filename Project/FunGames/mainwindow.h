@@ -38,6 +38,10 @@ private slots:
 
     void onMessageReceived(QJsonObject msg);
 
+    void on_guestRadioButton_clicked();
+
+    void on_HostRadioButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 

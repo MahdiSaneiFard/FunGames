@@ -56,8 +56,31 @@ void Client::processMessage(const QJsonObject &msg)
         qDebug() << "Assigned role:" << assignedRole;
     }
 
-    if (msg["type"].toString() == "move") {
-        emit moveReceived(this, msg);
+    else if (msg["type"].toString() == "move") {
+       // emit moveReceived(this, msg);
+    }
+
+    else if(type == "create_match")
+    {
+        if(!(otherClient))
+            qDebug() << "there is only one person connected to server";
+
+        QString newGameMode = msg["game"].toString();
+
+        QString hostColor = msg["hostColor"].toString();
+
+        int matchTime = msg["timeLimit"].toInt();
+
+        qDebug() << "new game mode : " << newGameMode;
+        qDebug() << "new hostColor : " << hostColor;
+        qDebug() << "new matchTime : " << matchTime;
+
+
+
+
+        if (otherClient) {
+            otherClient->sendMessage(msg);
+        }
     }
 }
 
