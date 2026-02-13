@@ -17,10 +17,14 @@ private slots:
     void onReadyRead();
     void onDisconnected();
 
+signals:
+    void moveReceived(Client* sender, QJsonObject data);
+
 private:
-    void processMessage(const QJsonObject &msg);
-    void sendMessage(const QJsonObject &msg);
-    void sendMessageToServer(const QString &text);
     QTcpSocket *socket;
     QByteArray buffer;
+
+public:
+    void processMessage(const QJsonObject &msg);
+    void sendMessage(const QJsonObject &msg);
 };

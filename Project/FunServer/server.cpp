@@ -1,6 +1,7 @@
 #include "Server.h"
 #include "Client.h"
 #include <QDebug>
+#include <QJsonObject>
 
 Server::Server(QObject *parent) : QObject(parent)
 {
@@ -25,9 +26,23 @@ void Server::onNewConnection()
     QTcpSocket *socket = tcpServer->nextPendingConnection();
     qDebug() << "New client connected";
     if (!client1)
+    {
         client1 = new Client(socket, this);
+        connect(client1, &Client::moveReceived, this, [this](Client* s, QJsonObject d){
+            if(activeGame) activeGame->handleMove(s, d);
+        });
+    }
     else if (!client2)
+    {
         client2 = new Client(socket, this);
+        connect(client2, &Client::moveReceived, this, [this](Client* s, QJsonObject d){
+            if(activeGame) activeGame->handleMove(s, d);
+        });
+
+        activeGame = new OthelloGame();
+        activeGame->assignRoles(client1, client2, "black");
+        activeGame->startGame();
+    }
     else
     {
         socket->disconnectFromHost();
