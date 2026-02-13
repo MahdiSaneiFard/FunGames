@@ -368,7 +368,7 @@
              <bool>true</bool>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="page">
              <layout class="QHBoxLayout" name="horizontalLayout_24">
@@ -509,7 +509,7 @@
               <item>
                <widget class="QGroupBox" name="groupBox_2">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="title">
                  <string>GroupBox</string>
@@ -525,7 +525,11 @@
                     </widget>
                    </item>
                    <item>
-                    <widget class="QTableWidget" name="activeMatchesTableWidget"/>
+                    <widget class="QTableWidget" name="activeMatchesTableWidget">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
                    </item>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_22">

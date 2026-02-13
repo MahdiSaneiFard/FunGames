@@ -10,7 +10,8 @@
 #include <QCryptographicHash>
 #include "loginwindow.h"
 #include "GameClient.h"
-
+#include "othellowindow.h"
+#include "connectfourwindow.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -339,7 +340,7 @@ void MainWindow::onMessageReceived(QJsonObject msg)
     QString type = msg["type"].toString();
     if(type == "create_match")
     {
-        qDebug() << msg["type"].toString() << msg["timelimit"].toInt() << msg["hostColor"].toString();
+        QMessageBox::warning(this, "ERROR", msg["hostColor"].toString() + msg["game"].toString());
         QString newGameMode = msg["game"].toString();
         QString hostColor = msg["hostColor"].toString();
         int matchTime = msg["timeLimit"].toInt();
@@ -435,6 +436,7 @@ void MainWindow::on_guestRadioButton_clicked()
     msg1["type"] = "role";
     msg1["role"] = "guest";
     client->sendMessage(msg1);
+    ui->stackedWidget->setEnabled(true);
 }
 
 
@@ -444,5 +446,51 @@ void MainWindow::on_HostRadioButton_clicked()
     msg1["type"] = "role";
     msg1["role"] = "host";
     client->sendMessage(msg1);
+  ui->stackedWidget->setEnabled(true);
+}
+
+
+void MainWindow::on_JoinPushButton_clicked()
+{
+    QTableWidget* table = ui->activeMatchesTableWidget;
+
+    // آیا چیزی انتخاب شده؟
+    if (table->selectedItems().isEmpty())
+    {
+        QMessageBox::warning(
+            this,
+            "No Match Selected",
+            "Please select a match before joining."
+            );
+        return;
+    }
+
+    // گرفتن ردیف انتخاب‌شده
+    int selectedRow = table->selectedItems().first()->row();
+
+    // خواندن اطلاعات از ستون‌ها
+    QString gameMode   = table->item(selectedRow, 0)->text();
+    QString hostColor  = table->item(selectedRow, 1)->text();
+    int matchTime      = table->item(selectedRow, 2)->text().toInt();
+
+    // تست
+    // اینجا می‌تونی پیام Join رو بفرستی به سرور
+    QJsonObject msg1;
+    msg1["type"] = "selected_match";
+    msg1["game"] = gameMode;
+    msg1["hostColor"] = hostColor;
+    msg1["timeLimit"] = matchTime;
+
+
+    client->sendMessage(msg1);
+    OthelloWindow* othellowindow = new OthelloWindow();
+
+    connect(othellowindow, &OthelloWindow::gameFinished, this, [=]() {
+        this->show();          // برگشت به لابی
+        othellowindow->deleteLater();
+    });
+
+    othellowindow->show();
+    this->hide();
 }
 

@@ -42,6 +42,8 @@ private slots:
 
     void on_HostRadioButton_clicked();
 
+    void on_JoinPushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 

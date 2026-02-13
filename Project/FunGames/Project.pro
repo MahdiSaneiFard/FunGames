@@ -12,23 +12,27 @@ CONFIG += c++17
 
 SOURCES += \
     GameClient.cpp \
+    connectfourwindow.cpp \
     loginwindow.cpp \
     main.cpp \
     mainwindow.cpp \
-    othello_window.cpp \
+    othellowindow.cpp \
     player.cpp
 
 HEADERS += \
     GameClient.h \
     GameOptions.h \
+    connectfourwindow.h \
     loginwindow.h \
     mainwindow.h \
-    othello_window.h \
+    othellowindow.h \
     player.h
 
 FORMS += \
+    connectfourwindow.ui \
     loginwindow.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    othellowindow.ui
 
 # for Email validation
 
