@@ -366,7 +366,7 @@ void MainWindow::onMessageReceived(QJsonObject msg)
         int matchTime = msg["timeLimit"].toInt();
 
         if(gameMode == "othello"){
-            OthelloWindow* othellowindow = new OthelloWindow(matchTime,hostColor);
+            OthelloWindow* othellowindow = new OthelloWindow();
 
 
             connect(othellowindow, &OthelloWindow::othelloFinished, this, [=]() {
@@ -522,21 +522,6 @@ void MainWindow::on_JoinPushButton_clicked()
     if(gameMode == "othello"){
         client->sendMessage(msg1);
 
-        QString color = "white";
-        if (hostColor == "white")
-            color = "black";
-
-        OthelloWindow* othellowindow = new OthelloWindow(matchTime,color);
-
-
-        connect(othellowindow, &OthelloWindow::othelloFinished, this, [=]() {
-            this->show();          // برگشت به لابی
-            othellowindow->deleteLater();
-        });
-
-        othellowindow->show();
-        connect(othellowindow, &OthelloWindow::sendMessage, this, &MainWindow::sendGameMessage);
-        connect(this, &MainWindow::OthelloMSG,othellowindow, &OthelloWindow::prossesMessage);
         this->hide();
     }
     else if(gameMode == "connectFour")
