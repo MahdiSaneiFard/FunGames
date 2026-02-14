@@ -6,7 +6,7 @@
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../../../../fun2/FunGames/mainwindow.h"
+#include "../../../Project/FunGames/mainwindow.h"
 #include <QtCore/qmetatype.h>
 
 #include <QtCore/qtmochelpers.h>

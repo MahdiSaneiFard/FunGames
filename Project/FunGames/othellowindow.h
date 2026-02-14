@@ -38,6 +38,7 @@ private:
     void createBoard();
     void setupInitialPieces();
     void updateButtonToPiece(int r, int c, QString color);
+    bool canMoveHere(int row, int col, QString color, const QJsonArray &boardArray);
 };
 
 #endif // OTHELLOWINDOW_H

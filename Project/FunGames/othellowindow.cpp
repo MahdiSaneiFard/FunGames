@@ -43,7 +43,7 @@ void OthelloWindow::createBoard() {
 
                 // ۲. فقط در خانه‌ای که مهره ندارد (سبز است) می‌توان کلیک کرد
                 // (فعلاً منطق پیچیده اتلو را فاکتور می‌گیریم و فقط جای خالی را چک می‌کنیم)
-                if (boardButtons[r][c]->styleSheet().contains("qradialgradient")) {
+                if (boardButtons[r][c]->styleSheet().contains("radius:0.5")) {
                     return;
                 }
 
@@ -63,6 +63,36 @@ void OthelloWindow::createBoard() {
 
     // ۲. قرار دادن ۴ مهره مرکزی (شروع بازی)
     setupInitialPieces();
+}
+
+bool OthelloWindow::canMoveHere(int row, int col, QString color, const QJsonArray &boardArray) {
+    // 1. بررسی خالی بودن خانه (در کلاینت 0 یعنی خالی)
+    if (boardArray[row].toArray()[col].toInt() != 0) return false;
+
+    int myVal = (color == "black") ? 1 : 2;
+    int oppVal = (color == "black") ? 2 : 1;
+
+    int dr[] = {-1, -1, -1, 0, 0, 1, 1, 1};
+    int dc[] = {-1, 0, 1, -1, 1, -1, 0, 1};
+
+    for (int i = 0; i < 8; i++) {
+        int r = row + dr[i];
+        int c = col + dc[i];
+        bool hasOpponentBetween = false;
+
+        // حرکت در جهت i تا وقتی مهره حریف هست
+        while (r >= 0 && r < 8 && c >= 0 && c < 8 && boardArray[r].toArray()[c].toInt() == oppVal) {
+            r += dr[i];
+            c += dc[i];
+            hasOpponentBetween = true;
+        }
+
+        // اگر بعد از مهره‌های حریف، مهره خودمان بود، حرکت مجاز است
+        if (hasOpponentBetween && r >= 0 && r < 8 && c >= 0 && c < 8) {
+            if (boardArray[r].toArray()[c].toInt() == myVal) return true;
+        }
+    }
+    return false;
 }
 
 void OthelloWindow::setupInitialPieces() {
@@ -135,20 +165,29 @@ void OthelloWindow::prossesMessage(QJsonObject msg)
                 for (int c = 0; c < 8; ++c) {
                     int cellValue = rowArray[c].toInt();
 
-                    // 0: Empty, 1: Black, 2: White (مطابق منطق سرور)
                     if (cellValue == 1) {
                         updateButtonToPiece(r, c, "black");
                     } else if (cellValue == 2) {
                         updateButtonToPiece(r, c, "white");
                     } else {
-                        // ریست کردن استایل برای خانه‌های خالی
-                        boardButtons[r][c]->setStyleSheet(
-                            "QPushButton { background-color: #1a9277; border: none; }"
-                            "QPushButton:hover { background-color: #147a63; }"
-                            );
+                        // خانه فعلاً از نظر سرور خالی است (0)
+                        // حالا کلاینت خودش چک می‌کند که آیا اینجا "پیشنهادی" هست یا نه
+                        if (currentTurn == myColor && canMoveHere(r, c, myColor, boardArray)) {
+                            // نمایش راهنمای حرکت
+                            boardButtons[r][c]->setStyleSheet("background-color: #2ecc71; border: 1px solid white;");
+                        } else {
+                            // خانه کاملاً خالی و بدون حرکت مجاز
+                            boardButtons[r][c]->setStyleSheet(
+                                "QPushButton { background-color: #1a9277; border: none; }"
+                                "QPushButton:hover { background-color: #147a63; }"
+                                );
+                        }
                     }
                 }
             }
+
+            ui->label_3->setText(QString::number(msg["blackScore"].toInt()));
+            ui->white_score->setText(QString::number(msg["whiteScore"].toInt()));
 
             // نمایش وضعیت نوبت و رنگ بازیکن به صورت همزمان
             QString status = (currentTurn == myColor) ? "YOUR TURN!" : "Waiting for opponent...";

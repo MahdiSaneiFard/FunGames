@@ -13,6 +13,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QStatusBar>
@@ -27,6 +28,10 @@ public:
     QWidget *gridLayoutWidget;
     QGridLayout *gridLayout;
     QFrame *boardContainer;
+    QLabel *label;
+    QLabel *label_2;
+    QLabel *label_3;
+    QLabel *white_score;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -50,6 +55,18 @@ public:
 
         gridLayout->addWidget(boardContainer, 0, 0, 1, 1);
 
+        label = new QLabel(centralwidget);
+        label->setObjectName("label");
+        label->setGeometry(QRect(110, 10, 81, 21));
+        label_2 = new QLabel(centralwidget);
+        label_2->setObjectName("label_2");
+        label_2->setGeometry(QRect(400, 10, 91, 21));
+        label_3 = new QLabel(centralwidget);
+        label_3->setObjectName("label_3");
+        label_3->setGeometry(QRect(210, 20, 49, 16));
+        white_score = new QLabel(centralwidget);
+        white_score->setObjectName("white_score");
+        white_score->setGeometry(QRect(510, 20, 49, 16));
         OthelloWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(OthelloWindow);
         menubar->setObjectName("menubar");
@@ -67,6 +84,10 @@ public:
     void retranslateUi(QMainWindow *OthelloWindow)
     {
         OthelloWindow->setWindowTitle(QCoreApplication::translate("OthelloWindow", "MainWindow", nullptr));
+        label->setText(QCoreApplication::translate("OthelloWindow", "black score", nullptr));
+        label_2->setText(QCoreApplication::translate("OthelloWindow", "white score", nullptr));
+        label_3->setText(QCoreApplication::translate("OthelloWindow", "2", nullptr));
+        white_score->setText(QCoreApplication::translate("OthelloWindow", "2", nullptr));
     } // retranslateUi
 
 };

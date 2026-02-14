@@ -35,6 +35,19 @@ void OthelloGame::broadcastGameState() {
     state["msgType"] = "update_board";
     state["currentPlayer"] = (currentPlayer == Black) ? "black" : "white";
 
+    int blackCount = 0;
+    int whiteCount = 0;
+
+    for (int r = 0; r < 8; ++r) {
+        for (int c = 0; c < 8; ++c) {
+            if (board[r][c] == Black) blackCount++;
+            else if (board[r][c] == White) whiteCount++;
+        }
+    }
+
+    state["blackScore"] = blackCount;
+    state["whiteScore"] = whiteCount;
+
     QJsonArray boardArray;
     for (int r = 0; r < 8; ++r) {
         QJsonArray rowArray;

@@ -6,7 +6,7 @@
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../../../../fun2/FunGames/smtp/src/mimecontentformatter.h"
+#include "../../../Project/FunGames/smtp/src/mimecontentformatter.h"
 #include <QtCore/qmetatype.h>
 
 #include <QtCore/qtmochelpers.h>

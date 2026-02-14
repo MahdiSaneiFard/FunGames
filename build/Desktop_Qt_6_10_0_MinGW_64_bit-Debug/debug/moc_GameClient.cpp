@@ -6,7 +6,7 @@
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../../../../fun2/FunGames/GameClient.h"
+#include "../../../Project/FunGames/GameClient.h"
 #include <QtCore/qmetatype.h>
 
 #include <QtCore/qtmochelpers.h>
