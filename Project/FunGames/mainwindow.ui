@@ -365,10 +365,10 @@
           <item>
            <widget class="QStackedWidget" name="stackedWidget">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="currentIndex">
-             <number>2</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="page">
              <layout class="QHBoxLayout" name="horizontalLayout_24">
@@ -548,6 +548,9 @@
                      </item>
                      <item>
                       <widget class="QPushButton" name="JoinPushButton">
+                       <property name="enabled">
+                        <bool>false</bool>
+                       </property>
                        <property name="text">
                         <string>Join</string>
                        </property>
@@ -579,7 +582,7 @@
      <x>0</x>
      <y>0</y>
      <width>949</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

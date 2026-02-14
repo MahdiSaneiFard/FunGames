@@ -18,7 +18,6 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-
     ui->setupUi(this);
     connect(ui->HostRadioButton, &QRadioButton::toggled, this, &MainWindow::onRoleChanged);
     connect(ui->guestRadioButton, &QRadioButton::toggled, this, &MainWindow::onRoleChanged);
@@ -34,6 +33,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->createdGamesTableWidget->setStyleSheet("QTableWidget { font: 14px; }");
 
 
+    ui->activeMatchesTableWidget->setColumnCount(3);
+    ui->activeMatchesTableWidget->setHorizontalHeaderLabels({"Game ID", "Color", "Time Limit"});
+    ui->activeMatchesTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->activeMatchesTableWidget->verticalHeader()->setVisible(false);
+    ui->activeMatchesTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->activeMatchesTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->activeMatchesTableWidget->setStyleSheet("QTableWidget { font: 14px; }");
 
 }
 
@@ -355,6 +361,7 @@ void MainWindow::onMessageReceived(QJsonObject msg)
     }
     else if(type == "othello")
     {
+        qDebug() << msg;
         emit OthelloMSG(msg);
     }
     else if(type == "connectFour")
@@ -365,7 +372,35 @@ void MainWindow::onMessageReceived(QJsonObject msg)
     {
         emit CheckersMSG(msg);
     }
+    else if(type == "start_game_broadcast")
+    {
+        QString game_type = msg["game"].toString();
+        qDebug() << msg;
 
+        if(game_type == "othello")
+        {
+            QString myColor = msg["yourColor"].toString();
+            OthelloWindow* gameWin = new OthelloWindow();
+
+            connect(gameWin, &OthelloWindow::sendMessage, this, &MainWindow::sendGameMessage);
+            connect(this, &MainWindow::OthelloMSG, gameWin, &OthelloWindow::prossesMessage);
+
+            // فرض کنیم در کلاس OthelloWindow تابعی به نام setPlayerColor داری
+            gameWin->setPlayerColor(myColor);
+
+            gameWin->show();
+            this->hide();
+            emit OthelloMSG(msg);
+        }
+        else if(game_type == "connectFour")
+        {
+            emit ConnectFourMSG(msg);
+        }
+        else if(game_type == "checkers")
+        {
+            emit CheckersMSG(msg);
+        }
+    }
 }
 void MainWindow::on_CreatePushButton_clicked()
 {
@@ -446,6 +481,15 @@ void MainWindow::on_guestRadioButton_clicked()
     msg1["role"] = "guest";
     client->sendMessage(msg1);
     ui->stackedWidget->setEnabled(true);
+
+    ui->stackedWidget->setCurrentIndex(1);
+    ui->page_2->setEnabled(true);
+    ui->groupBox_2->setEnabled(true);
+    ui->activeMatchesTableWidget->setEnabled(true);
+    ui->JoinPushButton->setEnabled(true);
+
+    ui->activeMatchesTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->activeMatchesTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 }
 
 
