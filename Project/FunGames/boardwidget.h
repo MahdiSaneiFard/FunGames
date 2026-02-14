@@ -21,6 +21,9 @@ protected:
 private:
     int board[6][7] = {}; // 0 empty, 1 black, 2 white
     QString playerColor;
+signals:
+    void columnClicked(int column);
+
 };
 
 #endif

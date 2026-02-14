@@ -1,5 +1,6 @@
 #include "BoardWidget.h"
 #include "DiscWidget.h"
+#include "qjsonobject.h"
 
 #include <QPainter>
 #include <QMouseEvent>
@@ -42,21 +43,11 @@ void BoardWidget::paintEvent(QPaintEvent*)
 void BoardWidget::mousePressEvent(QMouseEvent* event)
 {
     int column = event->pos().x() / (width() / 7);
-
-    // ستون valid؟
     if(column < 0 || column > 6) return;
 
-    // مهره خود بازیکن رو بینداز
-    dropDisc(column, playerColor);
-
-    // در اینجا می‌تونی پیام سرور بفرستی
-    // مثال:
-    // QJsonObject msg;
-    // msg["msgType"] = "move";
-    // msg["column"] = column;
-    // msg["color"] = playerColor;
-    // emit sendMessage(msg);
+    emit columnClicked(column); // فقط گزارش
 }
+
 
 void BoardWidget::dropDisc(int column, const QString& color)
 {

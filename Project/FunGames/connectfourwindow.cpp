@@ -14,6 +14,8 @@ ConnectFourWindow::ConnectFourWindow(int time, QString Collor, QWidget *parent)
 {
     setupUI();
     startTimer();
+    connect(board, &BoardWidget::columnClicked,
+            this, &ConnectFourWindow::onColumnClicked);
 }
 
 ConnectFourWindow::~ConnectFourWindow() {}
@@ -45,7 +47,30 @@ void ConnectFourWindow::setupUI()
     board->setPlayerColor(color);
     mainLayout->addWidget(topBar);
     mainLayout->addWidget(board, 0, Qt::AlignCenter);
+
 }
+
+void ConnectFourWindow::onColumnClicked(int column)
+{
+    // اگر نوبت من نیست، هیچی نکن
+    if(turn != color)
+        return;
+
+    // حرکت خودم
+    board->dropDisc(column, color);
+
+    // پیام به سرور
+    QJsonObject msg;
+    msg["type"] = "connectFour";
+    msg["msgType"] = "move";
+    msg["column"] = column;
+    msg["color"] = color;
+
+    emit sendMessage(msg);
+
+    // تغییر نوبت (یا منتظر پاسخ سرور)
+}
+
 
 void ConnectFourWindow::startTimer()
 {

@@ -31,8 +31,22 @@ void OthelloGame::startGame() {
 
 void OthelloGame::broadcastGameState() {
     QJsonObject state;
-    state["type"] = "update_board";
+    state["type"] = "othello";
+    state["msgType"] = "update_board";
     state["currentPlayer"] = (currentPlayer == Black) ? "black" : "white";
+
+    int blackCount = 0;
+    int whiteCount = 0;
+
+    for (int r = 0; r < 8; ++r) {
+        for (int c = 0; c < 8; ++c) {
+            if (board[r][c] == Black) blackCount++;
+            else if (board[r][c] == White) whiteCount++;
+        }
+    }
+
+    state["blackScore"] = blackCount;
+    state["whiteScore"] = whiteCount;
 
     QJsonArray boardArray;
     for (int r = 0; r < 8; ++r) {
@@ -43,6 +57,8 @@ void OthelloGame::broadcastGameState() {
         boardArray.append(rowArray);
     }
     state["board"] = boardArray;
+
+    qDebug() << state;
 
     // ارسال برای هر دو کلاینت
     if (blackPlayer) blackPlayer->sendMessage(state);
@@ -73,6 +89,7 @@ bool OthelloGame::IsValidMove(int row, int col, int playerColor) {
             return true;
         }
     }
+    qDebug() << row << ' ' << col << ' ' << playerColor;
     return false;
 }
 
@@ -122,11 +139,21 @@ void OthelloGame::handleMove(Client* player, const QJsonObject& move) {
     if (color != currentPlayer) return;
 
     if (IsValidMove(r, c, color)) {
+        qDebug() << move;
         flipPieces(r, c, color);
+
+        for (int i = 0 ; i < 8 ; i++)
+        {
+            for (int j = 0 ; j < 8 ; j++)
+            {
+                qDebug() << board[i][j];
+            }
+        }
 
         int opponent = (color == Black) ? White : Black;
 
         if (hasAnyValidMove(opponent)) {
+            qDebug() << opponent << move;
             currentPlayer = opponent;
         } else if (hasAnyValidMove(color)) {
             currentPlayer = color; // نوبت حریف سوخت (Pass)
@@ -150,9 +177,20 @@ void OthelloGame::endGame() {
     }
 
     QJsonObject endMsg;
-    endMsg["type"] = "game_over";
+    endMsg["type"] = "othello";
+    endMsg["msgType"] = "endgane";
     endMsg["blackScore"] = blackCount;
     endMsg["whiteScore"] = whiteCount;
+
+    QJsonArray boardArray;
+    for (int r = 0; r < 8; ++r) {
+        QJsonArray rowArray;
+        for (int c = 0; c < 8; ++c) {
+            rowArray.append(board[r][c]); // 0: Empty, 1: Black, 2: White
+        }
+        boardArray.append(rowArray);
+    }
+    endMsg["board"] = boardArray;
 
     if (blackCount > whiteCount) endMsg["winner"] = "black";
     else if (whiteCount > blackCount) endMsg["winner"] = "white";

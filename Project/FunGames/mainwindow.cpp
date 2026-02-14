@@ -366,7 +366,7 @@ void MainWindow::onMessageReceived(QJsonObject msg)
         int matchTime = msg["timeLimit"].toInt();
 
         if(gameMode == "othello"){
-            OthelloWindow* othellowindow = new OthelloWindow(matchTime,hostColor);
+            OthelloWindow* othellowindow = new OthelloWindow();
 
 
             connect(othellowindow, &OthelloWindow::othelloFinished, this, [=]() {
@@ -394,8 +394,30 @@ void MainWindow::onMessageReceived(QJsonObject msg)
             connect(this, &MainWindow::ConnectFourMSG,connectFourWindow, &ConnectFourWindow::prossesMessage);
             this->hide();
         }
+    }
+    else if (type == "start_game_broadcast")
+    {
+        QString game_type = msg["game"].toString();
+        qDebug() << msg;
+
+        if (game_type == "othello")
+        {
+            QString myColor = msg["yourColor"].toString();
+            OthelloWindow* othellowindow = new OthelloWindow();
 
 
+            connect(othellowindow, &OthelloWindow::othelloFinished, this, [=]() {
+                this->show();          // برگشت به لابی
+                othellowindow->deleteLater();
+            });
+
+            othellowindow->setPlayerColor(myColor);
+
+            othellowindow->show();
+            connect(othellowindow, &OthelloWindow::sendMessage, this, &MainWindow::sendGameMessage);
+            connect(this, &MainWindow::OthelloMSG,othellowindow, &OthelloWindow::prossesMessage);
+            this->hide();
+        }
     }
     else if(type == "othello")
     {
@@ -490,18 +512,7 @@ void MainWindow::on_HostRadioButton_clicked()
 
 void MainWindow::on_JoinPushButton_clicked()
 {
-    ConnectFourWindow* connectFourWindow = new ConnectFourWindow(5,"black");
 
-
-    connect(connectFourWindow, &ConnectFourWindow::conncetFourFinished, this, [=]() {
-        this->show();          // برگشت به لابی
-        connectFourWindow->deleteLater();
-    });
-
-    connectFourWindow->show();
-    connect(connectFourWindow, &ConnectFourWindow::sendMessage, this, &MainWindow::sendGameMessage);
-    connect(this, &MainWindow::ConnectFourMSG,connectFourWindow, &ConnectFourWindow::prossesMessage);
-    this->hide();///
 
     QTableWidget* table = ui->activeMatchesTableWidget;
 
@@ -534,23 +545,6 @@ void MainWindow::on_JoinPushButton_clicked()
 
     if(gameMode == "othello"){
         client->sendMessage(msg1);
-
-        QString color = "white";
-        if (hostColor == "white")
-            color = "black";
-
-        OthelloWindow* othellowindow = new OthelloWindow(matchTime,color);
-
-
-        connect(othellowindow, &OthelloWindow::othelloFinished, this, [=]() {
-            this->show();          // برگشت به لابی
-            othellowindow->deleteLater();
-        });
-
-        othellowindow->show();
-        connect(othellowindow, &OthelloWindow::sendMessage, this, &MainWindow::sendGameMessage);
-        connect(this, &MainWindow::OthelloMSG,othellowindow, &OthelloWindow::prossesMessage);
-        this->hide();
     }
     else if(gameMode == "connectFour")
     {

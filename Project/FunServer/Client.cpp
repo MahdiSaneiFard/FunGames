@@ -2,6 +2,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QDebug>
+#include "Server.h"
 
 Client::Client(QTcpSocket *s, QObject *parent)
     : QObject(parent), socket(s)
@@ -56,8 +57,16 @@ void Client::processMessage(const QJsonObject &msg)
         qDebug() << "Assigned role:" << assignedRole;
     }
 
-    else if (msg["type"].toString() == "move") {
-       // emit moveReceived(this, msg);
+    else if (msg["type"].toString() == "othello") {
+        // emit moveReceived(this, msg);
+        if (msg["msgType"] == "move")
+        {
+            qDebug() << msg;
+            Server* server = qobject_cast<Server*>(parent());
+            if (server && server->activeGame) {
+                server->activeGame->handleMove(this, msg);
+            }
+        }
     }
 
     else if(type == "create_match")
@@ -80,6 +89,60 @@ void Client::processMessage(const QJsonObject &msg)
 
         if (otherClient) {
             otherClient->sendMessage(msg);
+        }
+    }
+    else if (type == "selected_match")
+    {
+        qDebug() << msg["game"].toString();
+        Server* server = qobject_cast<Server*>(parent());
+        if (server && (msg["game"].toString() == "othello")) {
+            // ۱. ساخت بازی جدید
+            if (server->activeGame){ delete server->activeGame; server->activeGame = nullptr; }
+            if (server->activeCFGame){ delete server->activeCFGame; server->activeCFGame = nullptr; }
+            server->activeGame = new OthelloGame();
+
+            // ۲. تعیین نقش‌ها
+            QString hostCol = msg["hostColor"].toString();
+            server->activeGame->assignRoles(this, otherClient, hostCol);
+
+            QJsonObject msg1;
+            msg1["type"] = "start_game_broadcast";
+            msg1["game"] = "othello";
+            msg1["hostColor"] = msg["hostColor"].toString();
+            msg1["timeLimit"] = msg["timeLimit"];
+            msg1["yourColor"] = (hostCol == "white" ? "black" : "white");
+
+            qDebug() << msg1["type"].toString();
+
+            if (otherClient) {
+                otherClient->sendMessage(msg1);
+                msg1["yourColor"] = hostCol;
+                this->sendMessage(msg1);
+            }
+
+            server->activeGame->startGame();
+        }
+        if (server && (msg["game"].toString() == "connectFour")){
+            if (server->activeGame){ delete server->activeGame; server->activeGame = nullptr; }
+            if (server->activeCFGame){ delete server->activeCFGame; server->activeCFGame = nullptr; }
+            server->activeCFGame = new ConnectFourGame();
+
+            QString hostCol = msg["hostColor"].toString();
+
+            QJsonObject msg1;
+            msg1["type"] = "start_game_broadcast";
+            msg1["game"] = "othello";
+            msg1["hostColor"] = msg["hostColor"].toString();
+            msg1["timeLimit"] = msg["timeLimit"];
+            msg1["yourColor"] = (hostCol == "white" ? "black" : "white");
+
+            qDebug() << msg1["type"].toString();
+
+            if (otherClient) {
+                otherClient->sendMessage(msg1);
+                msg1["yourColor"] = hostCol;
+                this->sendMessage(msg1);
+            }
         }
     }
 }

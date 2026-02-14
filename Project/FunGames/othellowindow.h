@@ -4,8 +4,7 @@
 #include <QMainWindow>
 #include <QJsonObject>
 #include <QPushButton>
-#include <QGridLayout>
-#include <QVector>
+#include <QJsonArray>
 
 namespace Ui {
 class OthelloWindow;
@@ -16,37 +15,30 @@ class OthelloWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit OthelloWindow(int time,QString Collor ,QWidget *parent = nullptr);
-    QString color;
-    int matchTime;
-
+    explicit OthelloWindow(QWidget *parent = nullptr);
     void endGame();
     ~OthelloWindow();
-
+    void setPlayerColor(QString color);
 
 
 public slots:// protocol jadid ro begir ke daram bara input: type game - > game name siganl miad in ja
     void prossesMessage(QJsonObject);
 
+
 signals:
     void othelloFinished();
     void sendMessage(QJsonObject msg);
-private slots:
-    void cellClicked();
+
 
 private:
-
-    QWidget *central = nullptr;       // صفحه اصلی
-    QGridLayout *grid = nullptr;      // گرید زمین بازی
-    QVector<QVector<QPushButton*>> board; // ماتریس دکمه‌ها
-
     Ui::OthelloWindow *ui;
-    int boardSize = 8;  // اندازه صفحه
-    int cellSize = 70;  // اندازه هر خانه
-
+    QPushButton* boardButtons[8][8];
+    QString myColor;
+    QString currentTurn = "black";
     void createBoard();
-    void animateFlip(QPushButton *btn);
-
+    void setupInitialPieces();
+    void updateButtonToPiece(int r, int c, QString color);
+    bool canMoveHere(int row, int col, QString color, const QJsonArray &boardArray);
 };
 
 #endif // OTHELLOWINDOW_H

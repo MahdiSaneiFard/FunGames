@@ -12,6 +12,7 @@ CONFIG += c++17 cmdline
 SOURCES += \
         Client.cpp \
         Server.cpp \
+        connectfourgame.cpp \
         game.cpp \
         main.cpp \
         othellogame.cpp
@@ -24,5 +25,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     Client.h \
     Server.h \
+    connectfourgame.h \
     game.h \
     othellogame.h

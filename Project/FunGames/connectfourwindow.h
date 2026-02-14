@@ -25,13 +25,15 @@ signals:
 public slots:
     void prossesMessage(QJsonObject msg);
 
+
 private slots:
     void updateTimer();
-
+    void onColumnClicked(int column);
 private:
     QString color;      // "black" or "white"
     int matchTime;      // minutes
     int remainingSec;   // seconds
+    QString turn = "black";
 
     QLabel* timerLabel;
     QLabel* infoLabel;
