@@ -57,8 +57,16 @@ void Client::processMessage(const QJsonObject &msg)
         qDebug() << "Assigned role:" << assignedRole;
     }
 
-    else if (msg["type"].toString() == "move") {
+    else if (msg["type"].toString() == "othello") {
         // emit moveReceived(this, msg);
+        if (msg["msgType"] == "move")
+        {
+            qDebug() << msg;
+            Server* server = qobject_cast<Server*>(parent());
+            if (server && server->activeGame) {
+                server->activeGame->handleMove(this, msg);
+            }
+        }
     }
 
     else if(type == "create_match")

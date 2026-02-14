@@ -394,8 +394,30 @@ void MainWindow::onMessageReceived(QJsonObject msg)
             connect(this, &MainWindow::ConnectFourMSG,connectFourWindow, &ConnectFourWindow::prossesMessage);
             this->hide();
         }
+    }
+    else if (type == "start_game_broadcast")
+    {
+        QString game_type = msg["game"].toString();
+        qDebug() << msg;
+
+        if (game_type == "othello")
+        {
+            QString myColor = msg["yourColor"].toString();
+            OthelloWindow* othellowindow = new OthelloWindow();
 
 
+            connect(othellowindow, &OthelloWindow::othelloFinished, this, [=]() {
+                this->show();          // برگشت به لابی
+                othellowindow->deleteLater();
+            });
+
+            othellowindow->setPlayerColor(myColor);
+
+            othellowindow->show();
+            connect(othellowindow, &OthelloWindow::sendMessage, this, &MainWindow::sendGameMessage);
+            connect(this, &MainWindow::OthelloMSG,othellowindow, &OthelloWindow::prossesMessage);
+            this->hide();
+        }
     }
     else if(type == "othello")
     {
@@ -521,8 +543,6 @@ void MainWindow::on_JoinPushButton_clicked()
 
     if(gameMode == "othello"){
         client->sendMessage(msg1);
-
-        this->hide();
     }
     else if(gameMode == "connectFour")
     {
