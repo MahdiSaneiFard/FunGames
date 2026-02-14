@@ -418,6 +418,21 @@ void MainWindow::onMessageReceived(QJsonObject msg)
             connect(this, &MainWindow::OthelloMSG,othellowindow, &OthelloWindow::prossesMessage);
             this->hide();
         }
+        else if (game_type == "connectFour")
+        {
+            ConnectFourWindow* connectFourWindow = new ConnectFourWindow(msg["timeLimit"].toInt(),msg["yourColor"].toString());
+
+
+            connect(connectFourWindow, &ConnectFourWindow::conncetFourFinished, this, [=]() {
+                this->show();          // برگشت به لابی
+                connectFourWindow->deleteLater();
+            });
+
+            connectFourWindow->show();
+            connect(connectFourWindow, &ConnectFourWindow::sendMessage, this, &MainWindow::sendGameMessage);
+            connect(this, &MainWindow::ConnectFourMSG,connectFourWindow, &ConnectFourWindow::prossesMessage);
+            this->hide();
+        }
     }
     else if(type == "othello")
     {
@@ -550,7 +565,7 @@ void MainWindow::on_JoinPushButton_clicked()
     {
         client->sendMessage(msg1);
 
-        QString color = "white";
+        /*QString color = "white";
         if (hostColor == "white")
             color = "black";
         ConnectFourWindow* connectFourWindow = new ConnectFourWindow(matchTime,color);
@@ -564,7 +579,7 @@ void MainWindow::on_JoinPushButton_clicked()
         connectFourWindow->show();
         connect(connectFourWindow, &ConnectFourWindow::sendMessage, this, &MainWindow::sendGameMessage);
         connect(this, &MainWindow::ConnectFourMSG,connectFourWindow, &ConnectFourWindow::prossesMessage);
-        this->hide();
+        this->hide();*/
     }
 }
 

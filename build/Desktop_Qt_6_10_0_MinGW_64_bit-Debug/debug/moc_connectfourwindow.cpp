@@ -44,7 +44,10 @@ template <> constexpr inline auto ConnectFourWindow::qt_create_metaobjectdata<qt
         "sendMessage",
         "QJsonObject",
         "msg",
-        "prossesMessage"
+        "prossesMessage",
+        "updateTimer",
+        "onColumnClicked",
+        "column"
     };
 
     QtMocHelpers::UintData qt_methods {
@@ -56,7 +59,13 @@ template <> constexpr inline auto ConnectFourWindow::qt_create_metaobjectdata<qt
         }}),
         // Slot 'prossesMessage'
         QtMocHelpers::SlotData<void(QJsonObject)>(6, 2, QMC::AccessPublic, QMetaType::Void, {{
-            { 0x80000000 | 4, 2 },
+            { 0x80000000 | 4, 5 },
+        }}),
+        // Slot 'updateTimer'
+        QtMocHelpers::SlotData<void()>(7, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onColumnClicked'
+        QtMocHelpers::SlotData<void(int)>(8, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::Int, 9 },
         }}),
     };
     QtMocHelpers::UintData qt_properties {
@@ -84,6 +93,8 @@ void ConnectFourWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, in
         case 0: _t->conncetFourFinished(); break;
         case 1: _t->sendMessage((*reinterpret_cast<std::add_pointer_t<QJsonObject>>(_a[1]))); break;
         case 2: _t->prossesMessage((*reinterpret_cast<std::add_pointer_t<QJsonObject>>(_a[1]))); break;
+        case 3: _t->updateTimer(); break;
+        case 4: _t->onColumnClicked((*reinterpret_cast<std::add_pointer_t<int>>(_a[1]))); break;
         default: ;
         }
     }
@@ -114,14 +125,14 @@ int ConnectFourWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 3)
+        if (_id < 5)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 3;
+        _id -= 5;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 3)
+        if (_id < 5)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 3;
+        _id -= 5;
     }
     return _id;
 }

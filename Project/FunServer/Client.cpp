@@ -69,6 +69,24 @@ void Client::processMessage(const QJsonObject &msg)
         }
     }
 
+    else if (msg["type"] == "connectFour")
+    {
+        if (msg["msgType"] == "move")
+        {
+            qDebug() << msg;
+            Server* server = qobject_cast<Server*>(parent());
+            if (server && server->activeCFGame) {
+                int col = msg["column"].toInt();
+
+                // اصلاح ۲: تبدیل String رنگ به عدد (1 برای سیاه، 2 برای سفید)
+                QString colorStr = msg["color"].toString();
+                int playerVal = (colorStr == "black") ? 1 : 2;
+
+                server->activeCFGame->handlemove(col, playerVal);
+            }
+        }
+    }
+
     else if(type == "create_match")
     {
         if(!(otherClient))
@@ -128,10 +146,15 @@ void Client::processMessage(const QJsonObject &msg)
             server->activeCFGame = new ConnectFourGame();
 
             QString hostCol = msg["hostColor"].toString();
+            if (hostCol == "black") {
+                server->activeCFGame->setPlayers(this, otherClient);
+            } else {
+                server->activeCFGame->setPlayers(otherClient, this);
+            }
 
             QJsonObject msg1;
             msg1["type"] = "start_game_broadcast";
-            msg1["game"] = "othello";
+            msg1["game"] = "connectFour";
             msg1["hostColor"] = msg["hostColor"].toString();
             msg1["timeLimit"] = msg["timeLimit"];
             msg1["yourColor"] = (hostCol == "white" ? "black" : "white");
