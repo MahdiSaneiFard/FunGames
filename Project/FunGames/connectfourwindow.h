@@ -4,34 +4,42 @@
 #include <QMainWindow>
 #include <QJsonObject>
 
-namespace Ui {
-class ConnectFourWindow;
-}
+class QLabel;
+class QTimer;
+class BoardWidget;
 
 class ConnectFourWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit ConnectFourWindow(int time,QString Collor ,QWidget *parent = nullptr);
-    QString color;
-    int matchTime;
-
+    explicit ConnectFourWindow(int time, QString Collor, QWidget *parent = nullptr);
     ~ConnectFourWindow();
+
     void endGame();
-
-
-public slots:// protocol jadid ro begir ke daram bara input: type game - > game name siganl miad in ja
-    void prossesMessage(QJsonObject);
-
 
 signals:
     void conncetFourFinished();
     void sendMessage(QJsonObject msg);
 
+public slots:
+    void prossesMessage(QJsonObject msg);
+
+private slots:
+    void updateTimer();
 
 private:
-    Ui::ConnectFourWindow *ui;
+    QString color;      // "black" or "white"
+    int matchTime;      // minutes
+    int remainingSec;   // seconds
+
+    QLabel* timerLabel;
+    QLabel* infoLabel;
+    BoardWidget* board;
+    QTimer* gameTimer;
+
+    void setupUI();
+    void startTimer();
 };
 
 #endif // CONNECTFOURWINDOW_H

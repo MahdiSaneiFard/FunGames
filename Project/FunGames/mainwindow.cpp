@@ -490,6 +490,19 @@ void MainWindow::on_HostRadioButton_clicked()
 
 void MainWindow::on_JoinPushButton_clicked()
 {
+    ConnectFourWindow* connectFourWindow = new ConnectFourWindow(5,"black");
+
+
+    connect(connectFourWindow, &ConnectFourWindow::conncetFourFinished, this, [=]() {
+        this->show();          // برگشت به لابی
+        connectFourWindow->deleteLater();
+    });
+
+    connectFourWindow->show();
+    connect(connectFourWindow, &ConnectFourWindow::sendMessage, this, &MainWindow::sendGameMessage);
+    connect(this, &MainWindow::ConnectFourMSG,connectFourWindow, &ConnectFourWindow::prossesMessage);
+    this->hide();///
+
     QTableWidget* table = ui->activeMatchesTableWidget;
 
     // آیا چیزی انتخاب شده؟

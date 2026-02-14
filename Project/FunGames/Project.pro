@@ -12,7 +12,9 @@ CONFIG += c++17
 
 SOURCES += \
     GameClient.cpp \
+    boardwidget.cpp \
     connectfourwindow.cpp \
+    discwidget.cpp \
     loginwindow.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -22,7 +24,9 @@ SOURCES += \
 HEADERS += \
     GameClient.h \
     GameOptions.h \
+    boardwidget.h \
     connectfourwindow.h \
+    discwidget.h \
     loginwindow.h \
     mainwindow.h \
     othellowindow.h \
