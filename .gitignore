@@ -1,0 +1,17 @@
+# Qt Creator build folders
+build*/
+*-Debug/
+*-Release/
+
+# Qt specific
+*.user
+*.user.*
+
+# Clangd and Intellisense
+.qtc_clangd/
+*.idx
+*.cache/
+
+# Executables
+*.exe
+*.dll
