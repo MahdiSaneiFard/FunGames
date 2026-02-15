@@ -551,7 +551,7 @@ void MainWindow::on_JoinPushButton_clicked()
         client->sendMessage(msg1);
 
         QString color = "white";
-        if (hostColor == "white")
+        if (hostColor == "white")      //////// IN JJJJAAAA JOINBTN hast
             color = "black";
         ConnectFourWindow* connectFourWindow = new ConnectFourWindow(matchTime,color);
 

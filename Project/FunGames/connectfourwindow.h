@@ -37,7 +37,7 @@ private:
 
     QLabel* timerLabel;
     QLabel* infoLabel;
-    BoardWidget* board;
+    BoardWidget* board; // board->dropDisc(int column, const QString& color) bra endakhtan
     QTimer* gameTimer;
 
     void setupUI();

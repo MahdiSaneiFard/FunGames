@@ -199,5 +199,10 @@ void OthelloGame::endGame() {
     if (blackPlayer) blackPlayer->sendMessage(endMsg);
     if (whitePlayer) whitePlayer->sendMessage(endMsg);
 
+    if(endMsg["winner"].toString() == "black")
+    {
+        //blackPlayer->username : blackScore <WIN< whitePlayer->username : whiteScore
+    }
+
     // اینجا می‌توانید متدی برای ذخیره در دیتابیس هم فراخوانی کنید
 }
