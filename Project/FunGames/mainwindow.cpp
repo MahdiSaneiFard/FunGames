@@ -494,6 +494,12 @@ void MainWindow::on_ConnectToHostPushButton_clicked()
     connect(client, &GameClient::messageReceived, this, &MainWindow::onMessageReceived);
     connect(client, &GameClient::connected, this, [=]() {
         QMessageBox::information(this, "Connected", "Connected to server!");
+
+        QJsonObject loginMsg;
+        loginMsg["type"] = "login";
+        loginMsg["username"] = currentPlayer->getUserName(); // گرفتن یوزرنیم از شیء پلیر
+        client->sendMessage(loginMsg);
+
         ui->guestRadioButton->setEnabled(true);
         ui->HostRadioButton->setEnabled(true);
     });

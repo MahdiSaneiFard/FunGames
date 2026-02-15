@@ -57,6 +57,11 @@ void Client::processMessage(const QJsonObject &msg)
         qDebug() << "Assigned role:" << assignedRole;
     }
 
+    else if (type == "login") {
+        this->username = msg["username"].toString();
+        qDebug() << "Client identified as:" << username;
+    }
+
     else if (msg["type"].toString() == "othello") {
         // emit moveReceived(this, msg);
         if (msg["msgType"] == "move")
