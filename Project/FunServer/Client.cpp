@@ -96,7 +96,7 @@ void Client::processMessage(const QJsonObject &msg)
             qDebug() << msg;
             Server* server = qobject_cast<Server*>(parent());
             if (server && server->activeCFGame) {
-                server->activeCFGame->broadcastVictory((msg["color"].toString() == "black") ? 1 : 0,1000 ,1000);
+                server->activeCFGame->broadcastVictory((msg["color"].toString() == "white") ? 1 : 2,1000 ,1000);// az ghast barakse
             }
         }
     }

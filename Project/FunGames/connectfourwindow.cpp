@@ -104,7 +104,6 @@ void ConnectFourWindow::updateTimer()
         msg["color"] = color;
         gameTimer->stop();
         emit sendMessage(msg);
-        endGame();
     }
 
 }
@@ -147,5 +146,5 @@ void ConnectFourWindow::prossesMessage(QJsonObject msg)
 void ConnectFourWindow::endGame()
 {
     emit conncetFourFinished();
-    close();
+
 }
