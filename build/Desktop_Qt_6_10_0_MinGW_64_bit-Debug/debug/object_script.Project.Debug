@@ -1,5 +1,7 @@
 debug/GameClient.o
+debug/boardwidget.o
 debug/connectfourwindow.o
+debug/discwidget.o
 debug/loginwindow.o
 debug/main.o
 debug/mainwindow.o
@@ -25,7 +27,9 @@ debug/quotedprintable.o
 debug/smtpclient.o
 debug/qrc_resources.o
 debug/moc_GameClient.o
+debug/moc_boardwidget.o
 debug/moc_connectfourwindow.o
+debug/moc_discwidget.o
 debug/moc_loginwindow.o
 debug/moc_mainwindow.o
 debug/moc_othellowindow.o

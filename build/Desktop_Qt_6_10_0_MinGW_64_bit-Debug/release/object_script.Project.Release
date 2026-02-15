@@ -1,5 +1,7 @@
 release/GameClient.o
+release/boardwidget.o
 release/connectfourwindow.o
+release/discwidget.o
 release/loginwindow.o
 release/main.o
 release/mainwindow.o
@@ -25,7 +27,9 @@ release/quotedprintable.o
 release/smtpclient.o
 release/qrc_resources.o
 release/moc_GameClient.o
+release/moc_boardwidget.o
 release/moc_connectfourwindow.o
+release/moc_discwidget.o
 release/moc_loginwindow.o
 release/moc_mainwindow.o
 release/moc_othellowindow.o

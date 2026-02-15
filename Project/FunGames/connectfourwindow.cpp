@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QMessageBox>
 
 ConnectFourWindow::ConnectFourWindow(int time, QString Collor, QWidget *parent)
     : QMainWindow(parent),
@@ -52,12 +53,8 @@ void ConnectFourWindow::setupUI()
 
 void ConnectFourWindow::onColumnClicked(int column)
 {
-    // اگر نوبت من نیست، هیچی نکن
     if(turn != color)
         return;
-
-    // حرکت خودم
-    board->dropDisc(column, color);
 
     // پیام به سرور
     QJsonObject msg;
@@ -66,7 +63,10 @@ void ConnectFourWindow::onColumnClicked(int column)
     msg["column"] = column;
     msg["color"] = color;
 
+    qDebug() << msg;
+
     emit sendMessage(msg);
+
 
     // تغییر نوبت (یا منتظر پاسخ سرور)
 }
@@ -94,27 +94,52 @@ void ConnectFourWindow::updateTimer()
             .arg(min, 2, 10, QChar('0'))
             .arg(sec, 2, 10, QChar('0'))
         );
-
-    remainingSec--;
+    if(color == turn)
+        remainingSec--;
     if (remainingSec < 0)
     {
+        QJsonObject msg;
+        msg["type"] = "connectFour";
+        msg["msgType"] = "timesUp";
+        msg["color"] = color;
         gameTimer->stop();
+        emit sendMessage(msg);
         endGame();
     }
+
 }
 
 void ConnectFourWindow::prossesMessage(QJsonObject msg)
 {
-    QString type = msg["msgType"].toString();
+    QString msgType = msg["msgType"].toString();
 
-    if (type == "move")
-    {
+    qDebug() << msg << "update client";
+
+    if (msgType == "update") {
+        qDebug() << msg << "update client2";
         int col = msg["column"].toInt();
-        QString playerColor = msg["color"].toString(); // black / white
-        board->dropDisc(col, playerColor);
+        QString pColor = msg["color"].toString();
+
+        // حالا که سرور تایید کرده، مهره را می‌اندازیم
+        board->dropDisc(col, pColor);
+
+        // آپدیت نوبت برای حرکت بعدی
+        turn = msg["nextTurn"].toString();
+        infoLabel->setText(QString("You are %1 | Turn: %2")
+                               .arg(color)
+                               .arg(turn == color ? "YOUR TURN" : "Opponent's Turn"));
     }
-    else if (type == "end")
-    {
+    else if (msgType == "game_over") {
+        int col = msg["column"].toInt();
+        QString pColor = msg["color"].toString();
+        if(col != 1000)
+            board->dropDisc(col, pColor); // آخرین مهره پیروز
+
+        QString winner = msg["winner"].toString();
+        QString resultText = (winner == color) ? "You Won! 🎉" : "You Lost! 🚩";
+        if(winner == "draw") resultText = "It's a Draw! 🤝";
+
+        QMessageBox::information(this, "Game Over", resultText);
         endGame();
     }
 }

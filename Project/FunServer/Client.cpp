@@ -57,6 +57,11 @@ void Client::processMessage(const QJsonObject &msg)
         qDebug() << "Assigned role:" << assignedRole;
     }
 
+    else if (type == "login") {
+        this->username = msg["username"].toString();
+        qDebug() << "Client identified as:" << username;
+    }
+
     else if (msg["type"].toString() == "othello") {
         // emit moveReceived(this, msg);
         if (msg["msgType"] == "move")
@@ -65,6 +70,33 @@ void Client::processMessage(const QJsonObject &msg)
             Server* server = qobject_cast<Server*>(parent());
             if (server && server->activeGame) {
                 server->activeGame->handleMove(this, msg);
+            }
+        }
+    }
+
+    else if (msg["type"] == "connectFour")
+    {
+        if (msg["msgType"] == "move")
+        {
+            qDebug() << msg;
+            Server* server = qobject_cast<Server*>(parent());
+            if (server && server->activeCFGame) {
+                int col = msg["column"].toInt();
+
+                // اصلاح ۲: تبدیل String رنگ به عدد (1 برای سیاه، 2 برای سفید)
+                QString colorStr = msg["color"].toString();
+                int playerVal = (colorStr == "black") ? 1 : 2;
+
+                server->activeCFGame->handlemove(col, playerVal);
+            }
+        }
+
+        else if(msg["msgType"] == "timesUp")
+        {
+            qDebug() << msg;
+            Server* server = qobject_cast<Server*>(parent());
+            if (server && server->activeCFGame) {
+                server->activeCFGame->broadcastVictory((msg["color"].toString() == "black") ? 1 : 0,1000 ,1000);
             }
         }
     }
@@ -128,10 +160,15 @@ void Client::processMessage(const QJsonObject &msg)
             server->activeCFGame = new ConnectFourGame();
 
             QString hostCol = msg["hostColor"].toString();
+            if (hostCol == "black") {
+                server->activeCFGame->setPlayers(this, otherClient);
+            } else {
+                server->activeCFGame->setPlayers(otherClient, this);
+            }
 
             QJsonObject msg1;
             msg1["type"] = "start_game_broadcast";
-            msg1["game"] = "othello";
+            msg1["game"] = "connectFour";
             msg1["hostColor"] = msg["hostColor"].toString();
             msg1["timeLimit"] = msg["timeLimit"];
             msg1["yourColor"] = (hostCol == "white" ? "black" : "white");

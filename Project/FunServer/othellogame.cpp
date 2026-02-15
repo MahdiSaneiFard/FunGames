@@ -2,6 +2,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QSqlQuery>
+#include <QSqlError>
 
 OthelloGame::OthelloGame() {
     for(int i=0; i<8; ++i)
@@ -205,4 +207,28 @@ void OthelloGame::endGame() {
     }
 
     // اینجا می‌توانید متدی برای ذخیره در دیتابیس هم فراخوانی کنید
+
+    QString winnerUsername;
+    if (blackCount > whiteCount) {
+        winnerUsername = blackPlayer->username; // سیاه برد، پس یوزرنیم کلاینتِ سیاه را بردار
+    } else if (whiteCount > blackCount) {
+        winnerUsername = whitePlayer->username; // سفید برد، پس یوزرنیم کلاینتِ سفید را بردار
+    } else {
+        winnerUsername = "Draw";
+    }
+
+    QSqlQuery query;
+    query.prepare("INSERT INTO match_history (game_type, player_black, player_white, winner_username, black_score, white_score, date) "
+                  "VALUES (:game, :p_black, :p_white, :winner, :s_black, :s_white, datetime('now'))");
+
+    query.bindValue(":game", "othello"); // یا connectFour
+    query.bindValue(":p_black", blackPlayer->username);
+    query.bindValue(":p_white", whitePlayer->username);
+    query.bindValue(":winner", winnerUsername);
+    query.bindValue(":s_black", blackCount);
+    query.bindValue(":s_white", whiteCount);
+
+    if(!query.exec()) {
+        qDebug() << "Error saving to DB:" << query.lastError().text();
+    }
 }

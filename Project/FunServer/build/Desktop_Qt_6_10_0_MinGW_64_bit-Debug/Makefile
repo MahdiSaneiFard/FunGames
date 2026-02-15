@@ -138,6 +138,12 @@ Makefile: ../../FunServer.pro C:/Qt/6.10.0/mingw_64/mkspecs/win32-g++/qmake.conf
 		C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_opengl_private.pri \
 		C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_openglwidgets.pri \
 		C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_packetprotocol_private.pri \
+		C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_pdf.pri \
+		C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_pdf_private.pri \
+		C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_pdfquick.pri \
+		C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_pdfquick_private.pri \
+		C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_pdfwidgets.pri \
+		C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_pdfwidgets_private.pri \
 		C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_png_private.pri \
 		C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_printsupport.pri \
 		C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_printsupport_private.pri \
@@ -378,6 +384,12 @@ C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_opengl.pri:
 C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_opengl_private.pri:
 C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_openglwidgets.pri:
 C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_packetprotocol_private.pri:
+C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_pdf.pri:
+C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_pdf_private.pri:
+C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_pdfquick.pri:
+C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_pdfquick_private.pri:
+C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_pdfwidgets.pri:
+C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_pdfwidgets_private.pri:
 C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_png_private.pri:
 C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_printsupport.pri:
 C:/Qt/6.10.0/mingw_64/mkspecs/modules/qt_lib_printsupport_private.pri:

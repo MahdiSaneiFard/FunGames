@@ -418,6 +418,21 @@ void MainWindow::onMessageReceived(QJsonObject msg)
             connect(this, &MainWindow::OthelloMSG,othellowindow, &OthelloWindow::prossesMessage);
             this->hide();
         }
+        else if (game_type == "connectFour")
+        {
+            ConnectFourWindow* connectFourWindow = new ConnectFourWindow(msg["timeLimit"].toInt(),msg["yourColor"].toString());
+
+
+            connect(connectFourWindow, &ConnectFourWindow::conncetFourFinished, this, [=]() {
+                this->show();          // برگشت به لابی
+                connectFourWindow->deleteLater();
+            });
+
+            connectFourWindow->show();
+            connect(connectFourWindow, &ConnectFourWindow::sendMessage, this, &MainWindow::sendGameMessage);
+            connect(this, &MainWindow::ConnectFourMSG,connectFourWindow, &ConnectFourWindow::prossesMessage);
+            this->hide();
+        }
     }
     else if(type == "othello")
     {
@@ -479,6 +494,12 @@ void MainWindow::on_ConnectToHostPushButton_clicked()
     connect(client, &GameClient::messageReceived, this, &MainWindow::onMessageReceived);
     connect(client, &GameClient::connected, this, [=]() {
         QMessageBox::information(this, "Connected", "Connected to server!");
+
+        QJsonObject loginMsg;
+        loginMsg["type"] = "login";
+        loginMsg["username"] = currentPlayer->getUserName(); // گرفتن یوزرنیم از شیء پلیر
+        client->sendMessage(loginMsg);
+
         ui->guestRadioButton->setEnabled(true);
         ui->HostRadioButton->setEnabled(true);
     });
@@ -550,8 +571,11 @@ void MainWindow::on_JoinPushButton_clicked()
     {
         client->sendMessage(msg1);
 
-        QString color = "white";
-        if (hostColor == "white")      //////// IN JJJJAAAA JOINBTN hast
+
+
+        /*QString color = "white";
+        if (hostColor == "white")
+        >>>>>>> bff6c70dd2f12df7e2d42209b403a4b96a6ec733
             color = "black";
         ConnectFourWindow* connectFourWindow = new ConnectFourWindow(matchTime,color);
 
@@ -564,7 +588,7 @@ void MainWindow::on_JoinPushButton_clicked()
         connectFourWindow->show();
         connect(connectFourWindow, &ConnectFourWindow::sendMessage, this, &MainWindow::sendGameMessage);
         connect(this, &MainWindow::ConnectFourMSG,connectFourWindow, &ConnectFourWindow::prossesMessage);
-        this->hide();
+        this->hide();*/
     }
 }
 

@@ -24,7 +24,8 @@ signals:
 
 public slots:
     void prossesMessage(QJsonObject msg);
-
+signals:
+    void timeIsUp();
 
 private slots:
     void updateTimer();
