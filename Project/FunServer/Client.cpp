@@ -99,6 +99,10 @@ void Client::processMessage(const QJsonObject &msg)
                 server->activeCFGame->broadcastVictory((msg["color"].toString() == "white") ? 1 : 2,1000 ,1000);// az ghast barakse
             }
         }
+        else if(msg["msgType"] == "sticker")
+        {
+            otherClient->sendMessage(msg);
+        }
     }
 
     else if(type == "create_match")

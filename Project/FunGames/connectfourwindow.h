@@ -36,6 +36,10 @@ private:
     int remainingSec;   // seconds
     QString turn = "black";
 
+    QLabel* stickerDisplay;        // نمایش استیکر طرف مقابل
+    QWidget* stickerPanel;         // پنل انتخاب استیکر
+    QTimer* stickerTimer;          // تایمر حذف استیکر
+
     QLabel* timerLabel;
     QLabel* infoLabel;
     BoardWidget* board; // board->dropDisc(int column, const QString& color) bra endakhtan
