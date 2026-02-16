@@ -44,6 +44,7 @@ template <> constexpr inline auto ConnectFourWindow::qt_create_metaobjectdata<qt
         "sendMessage",
         "QJsonObject",
         "msg",
+        "timeIsUp",
         "prossesMessage",
         "updateTimer",
         "onColumnClicked",
@@ -57,15 +58,17 @@ template <> constexpr inline auto ConnectFourWindow::qt_create_metaobjectdata<qt
         QtMocHelpers::SignalData<void(QJsonObject)>(3, 2, QMC::AccessPublic, QMetaType::Void, {{
             { 0x80000000 | 4, 5 },
         }}),
+        // Signal 'timeIsUp'
+        QtMocHelpers::SignalData<void()>(6, 2, QMC::AccessPublic, QMetaType::Void),
         // Slot 'prossesMessage'
-        QtMocHelpers::SlotData<void(QJsonObject)>(6, 2, QMC::AccessPublic, QMetaType::Void, {{
+        QtMocHelpers::SlotData<void(QJsonObject)>(7, 2, QMC::AccessPublic, QMetaType::Void, {{
             { 0x80000000 | 4, 5 },
         }}),
         // Slot 'updateTimer'
-        QtMocHelpers::SlotData<void()>(7, 2, QMC::AccessPrivate, QMetaType::Void),
+        QtMocHelpers::SlotData<void()>(8, 2, QMC::AccessPrivate, QMetaType::Void),
         // Slot 'onColumnClicked'
-        QtMocHelpers::SlotData<void(int)>(8, 2, QMC::AccessPrivate, QMetaType::Void, {{
-            { QMetaType::Int, 9 },
+        QtMocHelpers::SlotData<void(int)>(9, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::Int, 10 },
         }}),
     };
     QtMocHelpers::UintData qt_properties {
@@ -92,9 +95,10 @@ void ConnectFourWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, in
         switch (_id) {
         case 0: _t->conncetFourFinished(); break;
         case 1: _t->sendMessage((*reinterpret_cast<std::add_pointer_t<QJsonObject>>(_a[1]))); break;
-        case 2: _t->prossesMessage((*reinterpret_cast<std::add_pointer_t<QJsonObject>>(_a[1]))); break;
-        case 3: _t->updateTimer(); break;
-        case 4: _t->onColumnClicked((*reinterpret_cast<std::add_pointer_t<int>>(_a[1]))); break;
+        case 2: _t->timeIsUp(); break;
+        case 3: _t->prossesMessage((*reinterpret_cast<std::add_pointer_t<QJsonObject>>(_a[1]))); break;
+        case 4: _t->updateTimer(); break;
+        case 5: _t->onColumnClicked((*reinterpret_cast<std::add_pointer_t<int>>(_a[1]))); break;
         default: ;
         }
     }
@@ -102,6 +106,8 @@ void ConnectFourWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, in
         if (QtMocHelpers::indexOfMethod<void (ConnectFourWindow::*)()>(_a, &ConnectFourWindow::conncetFourFinished, 0))
             return;
         if (QtMocHelpers::indexOfMethod<void (ConnectFourWindow::*)(QJsonObject )>(_a, &ConnectFourWindow::sendMessage, 1))
+            return;
+        if (QtMocHelpers::indexOfMethod<void (ConnectFourWindow::*)()>(_a, &ConnectFourWindow::timeIsUp, 2))
             return;
     }
 }
@@ -125,14 +131,14 @@ int ConnectFourWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 5)
+        if (_id < 6)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 5;
+        _id -= 6;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 5)
+        if (_id < 6)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 5;
+        _id -= 6;
     }
     return _id;
 }
@@ -147,5 +153,11 @@ void ConnectFourWindow::conncetFourFinished()
 void ConnectFourWindow::sendMessage(QJsonObject _t1)
 {
     QMetaObject::activate<void>(this, &staticMetaObject, 1, nullptr, _t1);
+}
+
+// SIGNAL 2
+void ConnectFourWindow::timeIsUp()
+{
+    QMetaObject::activate(this, &staticMetaObject, 2, nullptr);
 }
 QT_WARNING_POP

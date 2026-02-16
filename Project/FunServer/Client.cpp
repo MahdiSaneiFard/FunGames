@@ -66,10 +66,19 @@ void Client::processMessage(const QJsonObject &msg)
         // emit moveReceived(this, msg);
         if (msg["msgType"] == "move")
         {
-            qDebug() << msg;
+            //qDebug() << msg;
             Server* server = qobject_cast<Server*>(parent());
             if (server && server->activeGame) {
                 server->activeGame->handleMove(this, msg);
+            }
+        }
+
+        else if(msg["msgType"] == "timesUp")
+        {
+            qDebug() << msg;
+            Server* server = qobject_cast<Server*>(parent());
+            if (server && server->activeGame) {
+                server->activeGame->endGame(true, msg["player"].toString());
             }
         }
     }

@@ -60,7 +60,7 @@ void OthelloGame::broadcastGameState() {
     }
     state["board"] = boardArray;
 
-    qDebug() << state;
+    //qDebug() << state;
 
     // ارسال برای هر دو کلاینت
     if (blackPlayer) blackPlayer->sendMessage(state);
@@ -141,7 +141,7 @@ void OthelloGame::handleMove(Client* player, const QJsonObject& move) {
     if (color != currentPlayer) return;
 
     if (IsValidMove(r, c, color)) {
-        qDebug() << move;
+        //qDebug() << move;
         flipPieces(r, c, color);
 
         for (int i = 0 ; i < 8 ; i++)
@@ -155,22 +155,23 @@ void OthelloGame::handleMove(Client* player, const QJsonObject& move) {
         int opponent = (color == Black) ? White : Black;
 
         if (hasAnyValidMove(opponent)) {
-            qDebug() << opponent << move;
+            //qDebug() << opponent << move;
             currentPlayer = opponent;
         } else if (hasAnyValidMove(color)) {
             currentPlayer = color; // نوبت حریف سوخت (Pass)
         } else {
-            endGame(); // هیچ‌کدوم حرکت ندارن
+            endGame(0, "black"); // هیچ‌کدوم حرکت ندارن
             return;
         }
         broadcastGameState();
     }
 }
 
-void OthelloGame::endGame() {
+void OthelloGame::endGame(bool isTimeout, QString loserColor) {
     int blackCount = 0;
     int whiteCount = 0;
 
+    // ۱. همیشه امتیاز را محاسبه کن (حتی در تایم‌اوت برای ثبت در دیتابیس خوب است)
     for (int r = 0; r < 8; ++r) {
         for (int c = 0; c < 8; ++c) {
             if (board[r][c] == Black) blackCount++;
@@ -180,48 +181,55 @@ void OthelloGame::endGame() {
 
     QJsonObject endMsg;
     endMsg["type"] = "othello";
-    endMsg["msgType"] = "endgane";
+
+    if (!isTimeout) {
+        // حالت عادی: صفحه پر شده یا حرکتی باقی نمانده
+        endMsg["msgType"] = "endgane";
+        if (blackCount > whiteCount) endMsg["winner"] = "black";
+        else if (whiteCount > blackCount) endMsg["winner"] = "white";
+        else endMsg["winner"] = "draw";
+    }
+    else {
+        // حالت تایم‌اوت
+        endMsg["msgType"] = "endtime";
+        endMsg["color"] = loserColor; // کسی که زمانش تمام شده
+        endMsg["winner"] = (loserColor == "black") ? "white" : "black";
+    }
+
+    // اضافه کردن امتیازها و بورد به پیام (برای هر دو حالت)
     endMsg["blackScore"] = blackCount;
     endMsg["whiteScore"] = whiteCount;
 
     QJsonArray boardArray;
     for (int r = 0; r < 8; ++r) {
         QJsonArray rowArray;
-        for (int c = 0; c < 8; ++c) {
-            rowArray.append(board[r][c]); // 0: Empty, 1: Black, 2: White
-        }
+        for (int c = 0; c < 8; ++c) rowArray.append(board[r][c]);
         boardArray.append(rowArray);
     }
     endMsg["board"] = boardArray;
 
-    if (blackCount > whiteCount) endMsg["winner"] = "black";
-    else if (whiteCount > blackCount) endMsg["winner"] = "white";
-    else endMsg["winner"] = "draw";
+    qDebug() << endMsg;
 
+    // ارسال پیام
     if (blackPlayer) blackPlayer->sendMessage(endMsg);
     if (whitePlayer) whitePlayer->sendMessage(endMsg);
 
-    if(endMsg["winner"].toString() == "black")
-    {
-        //blackPlayer->username : blackScore <WIN< whitePlayer->username : whiteScore
-    }
-
-    // اینجا می‌توانید متدی برای ذخیره در دیتابیس هم فراخوانی کنید
-
+    // ۲. تعیین یوزرنیم برنده برای دیتابیس
     QString winnerUsername;
-    if (blackCount > whiteCount) {
-        winnerUsername = blackPlayer->username; // سیاه برد، پس یوزرنیم کلاینتِ سیاه را بردار
-    } else if (whiteCount > blackCount) {
-        winnerUsername = whitePlayer->username; // سفید برد، پس یوزرنیم کلاینتِ سفید را بردار
+    if (isTimeout) {
+        winnerUsername = (loserColor == "black") ? whitePlayer->username : blackPlayer->username;
     } else {
-        winnerUsername = "Draw";
+        if (blackCount > whiteCount) winnerUsername = blackPlayer->username;
+        else if (whiteCount > blackCount) winnerUsername = whitePlayer->username;
+        else winnerUsername = "Draw";
     }
 
+    // ۳. ذخیره در دیتابیس
     QSqlQuery query;
     query.prepare("INSERT INTO match_history (game_type, player_black, player_white, winner_username, black_score, white_score, date) "
                   "VALUES (:game, :p_black, :p_white, :winner, :s_black, :s_white, datetime('now'))");
 
-    query.bindValue(":game", "othello"); // یا connectFour
+    query.bindValue(":game", "othello");
     query.bindValue(":p_black", blackPlayer->username);
     query.bindValue(":p_white", whitePlayer->username);
     query.bindValue(":winner", winnerUsername);

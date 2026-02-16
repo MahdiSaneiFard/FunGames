@@ -32,6 +32,8 @@ public:
     QLabel *label_2;
     QLabel *label_3;
     QLabel *white_score;
+    QLabel *label_4;
+    QLabel *timer;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -67,6 +69,12 @@ public:
         white_score = new QLabel(centralwidget);
         white_score->setObjectName("white_score");
         white_score->setGeometry(QRect(510, 20, 49, 16));
+        label_4 = new QLabel(centralwidget);
+        label_4->setObjectName("label_4");
+        label_4->setGeometry(QRect(190, 540, 49, 16));
+        timer = new QLabel(centralwidget);
+        timer->setObjectName("timer");
+        timer->setGeometry(QRect(460, 540, 49, 16));
         OthelloWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(OthelloWindow);
         menubar->setObjectName("menubar");
@@ -88,6 +96,8 @@ public:
         label_2->setText(QCoreApplication::translate("OthelloWindow", "white score", nullptr));
         label_3->setText(QCoreApplication::translate("OthelloWindow", "2", nullptr));
         white_score->setText(QCoreApplication::translate("OthelloWindow", "2", nullptr));
+        label_4->setText(QCoreApplication::translate("OthelloWindow", "Time :", nullptr));
+        timer->setText(QString());
     } // retranslateUi
 
 };

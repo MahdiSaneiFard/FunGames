@@ -366,7 +366,7 @@ void MainWindow::onMessageReceived(QJsonObject msg)
         int matchTime = msg["timeLimit"].toInt();
 
         if(gameMode == "othello"){
-            OthelloWindow* othellowindow = new OthelloWindow();
+            OthelloWindow* othellowindow = new OthelloWindow(matchTime);
 
 
             connect(othellowindow, &OthelloWindow::othelloFinished, this, [=]() {
@@ -403,7 +403,7 @@ void MainWindow::onMessageReceived(QJsonObject msg)
         if (game_type == "othello")
         {
             QString myColor = msg["yourColor"].toString();
-            OthelloWindow* othellowindow = new OthelloWindow();
+            OthelloWindow* othellowindow = new OthelloWindow(msg["timeLimit"].toInt());
 
 
             connect(othellowindow, &OthelloWindow::othelloFinished, this, [=]() {
