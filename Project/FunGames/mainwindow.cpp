@@ -440,58 +440,78 @@ void MainWindow::onMessageReceived(QJsonObject msg)
     }
     else if (msg["msgType"] == "history_data")
     {
-        ui->listWidget_3->clear();
+        qDebug() << msg;
+        QString gameType = msg["type"].toString();
         QJsonArray history = msg["data"].toArray();
 
-        for (int i = 0; i < history.size(); ++i) {
-            QJsonObject game = history[i].toObject();
+        // ۲. انتخاب ListWidget هدف بر اساس نوع بازی
+        QListWidget* targetList = nullptr;
+        if (gameType == "othello") {
+            targetList = ui->listWidget_3;
+        } else if (gameType == "connectFour") {
+            targetList = ui->listWidget;
+        }
 
-            QString bUser = game["blackUser"].toString();
-            QString wUser = game["whiteUser"].toString();
-            int bScore = game["blackScore"].toInt();
-            int wScore = game["whiteScore"].toInt();
-            QString winner = game["winner"].toString();
+        if (targetList) {
+            targetList->clear(); // فقط لیست مربوطه پاک می‌شود
 
-            // تعیین رنگ‌ها بر اساس برنده
-            // اگر مساوی باشد هر دو سفید، اگر سیاه برده باشد سیاه سبز و سفید قرمز (یا خاکستری)
-            QString bColor = "#FFFFFF"; // پیش‌فرض سفید
-            QString wColor = "#FFFFFF";
+            for (int i = 0; i < history.size(); ++i) {
+                QJsonObject game = history[i].toObject();
 
-            if (winner == bUser) {
-                bColor = "#00FF00"; // سبز برای برنده
-                wColor = "#FF4444"; // قرمز برای بازنده
-            } else if (winner == wUser) {
-                wColor = "#00FF00";
-                bColor = "#FF4444";
+                QString bUser = game["blackUser"].toString();
+                QString wUser = game["whiteUser"].toString();
+                int bScore = game["blackScore"].toInt();
+                int wScore = game["whiteScore"].toInt();
+                QString winner = game["winner"].toString();
+                QString matchDate = game["date"].toString();
+                if(matchDate.isEmpty()) matchDate = "---";
+
+                QString bColor = "#FFFFFF";
+                QString wColor = "#FFFFFF";
+
+                if (winner == bUser) {
+                    bColor = "#00FF00";
+                    wColor = "#FF4444";
+                } else if (winner == wUser) {
+                    wColor = "#00FF00";
+                    bColor = "#FF4444";
+                }
+
+                // مدیریت نمایش متن (امتیاز برای اتلو، VS ساده برای دوز)
+                QString scoreText;
+                if (gameType == "connectFour") {
+                    scoreText = QString("<b style='color: %1;'>%2</b>"
+                                        " <span style='color: #55FFFF; font-weight: bold;'> VS </span> "
+                                        "<b style='color: %3;'>%4</b>")
+                                    .arg(bColor).arg(bUser).arg(wColor).arg(wUser);
+                } else {
+                    scoreText = QString("<b style='color: %1;'>%2</b> : <span style='color: #FFFFFF;'>%3</span>"
+                                        "&nbsp;&nbsp;&nbsp; <span style='color: #55FFFF; font-weight: bold;'>VS</span> &nbsp;&nbsp;&nbsp;"
+                                        "<span style='color: #FFFFFF;'>%4</span> : <b style='color: %5;'>%6</b>")
+                                    .arg(bColor).arg(bUser).arg(bScore).arg(wScore).arg(wColor).arg(wUser);
+                }
+
+                QString htmlText = QString(
+                                       "<div style='margin: 5px;'>"
+                                       "  <div style='font-size: 10px; color: #888888; margin-bottom: 4px;'>📅 %1</div>"
+                                       "  <div style='font-size: 15px; font-family: Segoe UI;'> %2 </div>"
+                                       "  <div style='margin-top: 8px; color: #AAAAAA; font-size: 13px;'>"
+                                       "    🏆 Winner: <b style='color: #FFD700;'>%3</b>"
+                                       "  </div>"
+                                       "</div>"
+                                       ).arg(matchDate).arg(scoreText).arg(winner);
+
+                // اضافه کردن به ListWidget هدف
+                QListWidgetItem* item = new QListWidgetItem();
+                targetList->addItem(item);
+
+                QLabel* label = new QLabel(htmlText);
+                label->setStyleSheet("background: transparent;");
+                label->setAlignment(Qt::AlignCenter);
+
+                item->setSizeHint(QSize(label->sizeHint().width(), 95));
+                targetList->setItemWidget(item, label);
             }
-
-            QString htmlText = QString(
-                                   "<div style='margin: 5px;'>"
-                                   "  <div style='font-size: 15px; font-family: Segoe UI;'>"
-                                   // نام بازیکن سیاه با رنگ متغیر (bColor) - امتیاز با رنگ ثابت سفید (#FFFFFF)
-                                   "    <b style='color: %1;'>%2</b> : <span style='color: #FFFFFF;'>%3</span>"
-                                   "    &nbsp;&nbsp;&nbsp; <span style='color: #55FFFF; font-weight: bold;'>VS</span> &nbsp;&nbsp;&nbsp;"
-                                   // امتیاز بازیکن سفید با رنگ ثابت سفید - نام بازیکن با رنگ متغیر (wColor)
-                                   "    <span style='color: #FFFFFF;'>%4</span> : <b style='color: %5;'>%6</b>"
-                                   "  </div>"
-                                   "  <div style='margin-top: 10px; color: #AAAAAA; font-size: 13px;'>"
-                                   "    🏆 Winner: <b style='color: #FFD700;'>%7</b>"
-                                   "  </div>"
-                                   "</div>"
-                                   ).arg(bColor).arg(bUser).arg(bScore)
-                                   .arg(wScore).arg(wColor).arg(wUser) // دقت کن که جای wScore و wColor را در arg جابجا کردیم تا با فرمت بالا بخورد
-                                   .arg(winner);
-
-            // باقی مراحل اضافه کردن به ListWidget...
-            QListWidgetItem* item = new QListWidgetItem();
-            ui->listWidget_3->addItem(item);
-
-            QLabel* label = new QLabel(htmlText);
-            label->setStyleSheet("background: transparent;");
-            label->setAlignment(Qt::AlignCenter);
-
-            item->setSizeHint(QSize(label->sizeHint().width(), 80)); // ارتفاع ثابت برای هر کارت
-            ui->listWidget_3->setItemWidget(item, label);
         }
     }
     else if(type == "othello")
@@ -673,6 +693,21 @@ void MainWindow::on_tabWidget_currentChanged(int index)
         // ۳. اختیاری: نمایش یک متن "در حال بارگذاری..." در لیست
         ui->listWidget_3->clear();
         ui->listWidget_3->addItem("Loading history...");
+    }
+
+    else if (ui->tabWidget->tabText(index) == "Connect Four") {
+        qDebug() << "amid";
+        // ۲. ارسال درخواست به سرور برای گرفتن تاریخچه
+        QJsonObject request;
+        request["type"] = "connectFour";
+        request["msgType"] = "get_history";
+        request["username"] = ui->Profile_username_line->text(); // متغیری که یوزرنیم بازیکن لاگین شده در آن است
+
+        client->sendMessage(request);
+
+        // ۳. اختیاری: نمایش یک متن "در حال بارگذاری..." در لیست
+        ui->listWidget->clear();
+        ui->listWidget->addItem("Loading history...");
     }
 }
 

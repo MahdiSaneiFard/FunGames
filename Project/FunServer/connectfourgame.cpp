@@ -1,5 +1,7 @@
 #include "connectfourgame.h"
+#include "qsqlerror.h"
 #include <QJsonObject>
+#include <qsqlquery.h>
 
 ConnectFourGame::ConnectFourGame() {
     for (int i = 0 ; i < 6 ; i++)
@@ -77,6 +79,33 @@ void ConnectFourGame::broadcastVictory(int winnerVal, int lastRow, int lastCol) 
         msg["winner"] = (winnerVal == 1) ? "black" : "white";
     }
 
+    QString blackName = blackPlayer ? blackPlayer->username : "Unknown";
+    QString whiteName = whitePlayer ? whitePlayer->username : "Unknown";
+    QString winnerUsername;
+
+    if (winnerVal == 0) {
+        winnerUsername = "Draw";
+    } else {
+        winnerUsername = (winnerVal == 1) ? blackName : whiteName;
+    }
+
+    // ۲. ذخیره در دیتابیس (مشابه اتلو اما با game_type متفاوت)
+    QSqlQuery query;
+    query.prepare("INSERT INTO match_history (game_type, player_black, player_white, winner_username, black_score, white_score, date) "
+                  "VALUES (:game, :p_black, :p_white, :winner, :s_black, :s_white, datetime('now', 'localtime'))");
+
+    query.bindValue(":game", "connectFour"); // نوع بازی را اینجا متمایز می‌کنیم
+    query.bindValue(":p_black", blackName);
+    query.bindValue(":p_white", whiteName);
+    query.bindValue(":winner", winnerUsername);
+    query.bindValue(":s_black", (winnerVal == 1 ? 1 : 0)); // برای دوز چون امتیاز عددی نداریم، 1 یا 0 می‌گذاریم
+    query.bindValue(":s_white", (winnerVal == 2 ? 1 : 0));
+
+    if(!query.exec()) {
+        qDebug() << "Error saving ConnectFour to DB:" << query.lastError().text();
+    }
+
+    // ۳. ارسال پیام نهایی به کلاینت‌ها (کدهای قبلی خودت)
     if (blackPlayer) blackPlayer->sendMessage(msg);
     if (whitePlayer) whitePlayer->sendMessage(msg);
 }

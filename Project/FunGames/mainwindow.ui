@@ -325,7 +325,26 @@ QListWidget#listWidget_3::item:hover {
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_6">
               <item>
-               <widget class="QListWidget" name="listWidget"/>
+               <widget class="QListWidget" name="listWidget">
+                <property name="styleSheet">
+                 <string notr="true">QListWidget#listWidget_3 {
+    background-color: #2b2b2b;
+    border: none;
+    outline: none;
+}
+
+QListWidget#listWidget_3::item {
+    width: 100%;
+    padding: 15px; 
+    color: white;
+    border-bottom: 1px solid #3d3d3d; */
+}
+
+QListWidget#listWidget_3::item:hover {
+    background-color: #353535;
+}</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>

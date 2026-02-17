@@ -84,18 +84,19 @@ void Client::processMessage(const QJsonObject &msg)
                 server->activeGame->endGame(true, msg["player"].toString());
             }
         }
-
         else if (msg["msgType"] == "get_history")
         {
+            qDebug() << msg;
             QString username = msg["username"].toString();
+            QString requestedGame = msg["type"].toString(); // کلاینت باید بگوید "othello" یا "connectFour"
 
             QSqlQuery query;
-            // انتخاب بازی‌هایی که کاربر در آن‌ها سیاه یا سفید بوده است
-            query.prepare("SELECT player_black, player_white, black_score, white_score, winner_username "
+            query.prepare("SELECT player_black, player_white, black_score, white_score, winner_username, date "
                           "FROM match_history "
-                          "WHERE (player_black = :user OR player_white = :user) AND game_type = 'othello' "
+                          "WHERE (player_black = :user OR player_white = :user) AND game_type = :game "
                           "ORDER BY date DESC");
             query.bindValue(":user", username);
+            query.bindValue(":game", requestedGame);
 
             if (query.exec()) {
                 QJsonArray historyArray;
@@ -106,25 +107,19 @@ void Client::processMessage(const QJsonObject &msg)
                     gameEntry["blackScore"] = query.value(2).toInt();
                     gameEntry["whiteScore"] = query.value(3).toInt();
                     gameEntry["winner"] = query.value(4).toString();
+                    gameEntry["date"] = query.value(5).toString();
+                    gameEntry["gameType"] = requestedGame; // برای کلاینت بفرستیم که بداند چه بازی‌ای است
                     historyArray.append(gameEntry);
                 }
 
-                // ساخت پیام نهایی برای کلاینت
                 QJsonObject response;
-                response["type"] = "othello";
+                response["type"] = requestedGame; // نوع بازی در پاسخ
                 response["msgType"] = "history_data";
                 response["data"] = historyArray;
-
-                // ارسال پیام به همین کلاینتی که درخواست داده بود
                 this->sendMessage(response);
-
-                qDebug() << "History sent to" << username << ":" << historyArray.size() << "matches found.";
-            } else {
-                qDebug() << "SQL Error in get_history:" << query.lastError().text();
             }
         }
     }
-
     else if (msg["type"] == "connectFour")
     {
         if (msg["msgType"] == "move")
@@ -153,6 +148,41 @@ void Client::processMessage(const QJsonObject &msg)
         else if(msg["msgType"] == "sticker")
         {
             otherClient->sendMessage(msg);
+        }
+        else if (msg["msgType"] == "get_history")
+        {
+            qDebug() << msg;
+            QString username = msg["username"].toString();
+            QString requestedGame = msg["type"].toString(); // کلاینت باید بگوید "othello" یا "connectFour"
+
+            QSqlQuery query;
+            query.prepare("SELECT player_black, player_white, black_score, white_score, winner_username, date "
+                          "FROM match_history "
+                          "WHERE (player_black = :user OR player_white = :user) AND game_type = :game "
+                          "ORDER BY date DESC");
+            query.bindValue(":user", username);
+            query.bindValue(":game", requestedGame);
+
+            if (query.exec()) {
+                QJsonArray historyArray;
+                while (query.next()) {
+                    QJsonObject gameEntry;
+                    gameEntry["blackUser"] = query.value(0).toString();
+                    gameEntry["whiteUser"] = query.value(1).toString();
+                    gameEntry["blackScore"] = query.value(2).toInt();
+                    gameEntry["whiteScore"] = query.value(3).toInt();
+                    gameEntry["winner"] = query.value(4).toString();
+                    gameEntry["date"] = query.value(5).toString();
+                    gameEntry["gameType"] = requestedGame; // برای کلاینت بفرستیم که بداند چه بازی‌ای است
+                    historyArray.append(gameEntry);
+                }
+
+                QJsonObject response;
+                response["type"] = requestedGame; // نوع بازی در پاسخ
+                response["msgType"] = "history_data";
+                response["data"] = historyArray;
+                this->sendMessage(response);
+            }
         }
     }
 

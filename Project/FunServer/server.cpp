@@ -26,6 +26,8 @@ Server::Server(QObject *parent) : QObject(parent)
                    "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                    "game_type TEXT, player_black TEXT, player_white TEXT, "
                    "winner_username TEXT, black_score INTEGER, white_score INTEGER, date DATETIME)");
+
+        query.exec("ALTER TABLE match_history ADD COLUMN date DATETIME");
     }
 }
 
