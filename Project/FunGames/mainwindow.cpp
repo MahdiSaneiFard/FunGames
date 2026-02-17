@@ -434,6 +434,41 @@ void MainWindow::onMessageReceived(QJsonObject msg)
             this->hide();
         }
     }
+    else if (msg["msgType"] == "history_data")
+    {
+        ui->listWidget_3->clear();
+        QJsonArray history = msg["data"].toArray();
+
+        for (int i = 0; i < history.size(); ++i) {
+            QJsonObject game = history[i].toObject();
+
+            // ۱. استخراج داده‌ها
+            QString bUser  = game["blackUser"].toString();
+            int bScore     = game["blackScore"].toInt();
+            int wScore     = game["whiteScore"].toInt();
+            QString wUser  = game["whiteUser"].toString();
+            QString winner = game["winner"].toString();
+
+            // ۲. ساختن متن با فرمت تراز شده
+            // استفاده از \t (تب) یا فاصله‌های منظم برای خط اول
+            QString line1 = QString("%1 : %2      VS      %3 : %4")
+                                .arg(bUser).arg(bScore).arg(wScore).arg(wUser);
+            QString line2 = QString("Winner: %1").arg(winner);
+
+            QString finalFullText = line1 + "\n" + line2;
+
+            // ۳. ایجاد آیتم و تنظیم تراز وسط
+            QListWidgetItem* item = new QListWidgetItem(finalFullText);
+
+            // این خط باعث می‌شود متن در کل عرض کادر وسط‌چین شود
+            item->setTextAlignment(Qt::AlignCenter);
+
+            // تنظیم فونت برای خوانایی بهتر (اختیاری)
+            item->setFont(QFont("Segoe UI", 10, QFont::Bold));
+
+            ui->listWidget_3->addItem(item);
+        }
+    }
     else if(type == "othello")
     {
         emit OthelloMSG(msg);
@@ -595,5 +630,24 @@ void MainWindow::on_JoinPushButton_clicked()
 void MainWindow::sendGameMessage(QJsonObject msg)
 {
     client->sendMessage(msg);
+}
+
+
+void MainWindow::on_tabWidget_currentChanged(int index)
+{
+    if (ui->tabWidget->tabText(index) == "Othello") {
+
+        // ۲. ارسال درخواست به سرور برای گرفتن تاریخچه
+        QJsonObject request;
+        request["type"] = "othello";
+        request["msgType"] = "get_history";
+        request["username"] = ui->Profile_username_line->text(); // متغیری که یوزرنیم بازیکن لاگین شده در آن است
+
+        client->sendMessage(request);
+
+        // ۳. اختیاری: نمایش یک متن "در حال بارگذاری..." در لیست
+        ui->listWidget_3->clear();
+        ui->listWidget_3->addItem("Loading history...");
+    }
 }
 

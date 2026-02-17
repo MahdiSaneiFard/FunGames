@@ -47,6 +47,8 @@ private slots:
 
     void on_JoinPushButton_clicked();
 
+    void on_tabWidget_currentChanged(int index);
+
 private:
     Ui::MainWindow *ui;
 

@@ -1,13 +1,32 @@
 #include "Server.h"
 #include "Client.h"
+#include "qsqlquery.h"
 #include <QDebug>
 #include <QJsonObject>
+#include <QSqlDatabase>
+#include <QSqlError>
 
 Server::Server(QObject *parent) : QObject(parent)
 {
     tcpServer = new QTcpServer(this);
     connect(tcpServer, &QTcpServer::newConnection,
             this, &Server::onNewConnection);
+
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("fungames.db");
+
+    if (!db.open()) {
+        qDebug() << "Failed to connect to database:" << db.lastError().text();
+    } else {
+        qDebug() << "Database connected successfully!";
+
+        // اطمینان از وجود جدول
+        QSqlQuery query;
+        query.exec("CREATE TABLE IF NOT EXISTS match_history ("
+                   "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                   "game_type TEXT, player_black TEXT, player_white TEXT, "
+                   "winner_username TEXT, black_score INTEGER, white_score INTEGER, date DATETIME)");
+    }
 }
 
 bool Server::start(quint16 port)

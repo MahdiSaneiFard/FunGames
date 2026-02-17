@@ -2,7 +2,10 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QDebug>
+#include <QSqlQuery>
 #include "Server.h"
+#include "qjsonarray.h"
+#include "qsqlerror.h"
 
 Client::Client(QTcpSocket *s, QObject *parent)
     : QObject(parent), socket(s)
@@ -79,6 +82,45 @@ void Client::processMessage(const QJsonObject &msg)
             Server* server = qobject_cast<Server*>(parent());
             if (server && server->activeGame) {
                 server->activeGame->endGame(true, msg["player"].toString());
+            }
+        }
+
+        else if (msg["msgType"] == "get_history")
+        {
+            QString username = msg["username"].toString();
+
+            QSqlQuery query;
+            // انتخاب بازی‌هایی که کاربر در آن‌ها سیاه یا سفید بوده است
+            query.prepare("SELECT player_black, player_white, black_score, white_score, winner_username "
+                          "FROM match_history "
+                          "WHERE (player_black = :user OR player_white = :user) AND game_type = 'othello' "
+                          "ORDER BY date DESC");
+            query.bindValue(":user", username);
+
+            if (query.exec()) {
+                QJsonArray historyArray;
+                while (query.next()) {
+                    QJsonObject gameEntry;
+                    gameEntry["blackUser"] = query.value(0).toString();
+                    gameEntry["whiteUser"] = query.value(1).toString();
+                    gameEntry["blackScore"] = query.value(2).toInt();
+                    gameEntry["whiteScore"] = query.value(3).toInt();
+                    gameEntry["winner"] = query.value(4).toString();
+                    historyArray.append(gameEntry);
+                }
+
+                // ساخت پیام نهایی برای کلاینت
+                QJsonObject response;
+                response["type"] = "othello";
+                response["msgType"] = "history_data";
+                response["data"] = historyArray;
+
+                // ارسال پیام به همین کلاینتی که درخواست داده بود
+                this->sendMessage(response);
+
+                qDebug() << "History sent to" << username << ":" << historyArray.size() << "matches found.";
+            } else {
+                qDebug() << "SQL Error in get_history:" << query.lastError().text();
             }
         }
     }

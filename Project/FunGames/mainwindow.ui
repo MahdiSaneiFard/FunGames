@@ -278,7 +278,26 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
-               <widget class="QListWidget" name="listWidget_3"/>
+               <widget class="QListWidget" name="listWidget_3">
+                <property name="styleSheet">
+                 <string notr="true">QListWidget#listWidget_3 {
+    background-color: #2b2b2b;
+    border: none;
+    outline: none;
+}
+
+QListWidget#listWidget_3::item {
+    width: 100%;
+    padding: 15px; 
+    color: white;
+    border-bottom: 1px solid #3d3d3d; */
+}
+
+QListWidget#listWidget_3::item:hover {
+    background-color: #353535;
+}</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
@@ -554,7 +573,7 @@
      <x>0</x>
      <y>0</y>
      <width>1135</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
