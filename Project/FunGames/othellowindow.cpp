@@ -3,13 +3,71 @@
 #include <QJsonObject>
 #include <QString>
 #include <QGridLayout>
+#include <QMessageBox>
 
-OthelloWindow::OthelloWindow(QWidget *parent)
+OthelloWindow::OthelloWindow(int time, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::OthelloWindow)
 {
     ui->setupUi(this);
+    this->matchTime = time;
+    this->remainingSec = time * 60;
+
     createBoard();
+    gameTimer = new QTimer(this);
+    connect(gameTimer, &QTimer::timeout, this, &OthelloWindow::updateTimer);
+    startTimer();
+}
+
+void OthelloWindow::startTimer()
+{
+    if (gameTimer) {
+        updateTimer(); // برای اینکه از همان لحظه اول لیبل آپدیت شود
+        gameTimer->start(1000); // هر ۱۰۰۰ میلی‌ثانیه (۱ ثانیه) یکبار تیک بزند
+    }
+}
+
+void OthelloWindow::updateTimer()
+{
+    // ۱. تبدیل ثانیه کل به دقیقه و ثانیه (این‌ها int هستند)
+    int min = remainingSec / 60;
+    int sec = remainingSec % 60;
+
+    // ۲. تبدیل اعداد به String با فرمت دو رقمی و ست کردن روی لیبل UI
+    ui->timer->setText(
+        QString("%1:%2")
+            .arg(min, 2, 10, QChar('0')) // عدد اول، حداقل ۲ رقم، مبنای ۱۰، پر کردن با کاراکتر '0'
+            .arg(sec, 2, 10, QChar('0'))
+        );
+
+    // ۳. منطق کم شدن زمان
+    if(myColor == currentTurn) {
+        remainingSec--;
+
+        // قرمز کردن رنگ متن وقتی زمان کم است (مثلاً زیر ۱۰ ثانیه)
+        if (remainingSec <= 10) {
+            ui->timer->setStyleSheet("color: red; font-weight: bold;");
+        }
+    }
+
+    // ۴. اتمام زمان
+    if (remainingSec <= 0) {
+        remainingSec = 0; // جلوگیری از منفی شدن
+        gameTimer->stop(); // توقف تیک‌تاک تایمر
+
+        // نمایش 00:00 روی صفحه
+        ui->timer->setText("00:00");
+
+        // ۴. اطلاع‌رسانی به سرور که زمان من تمام شده است
+        QJsonObject timeoutMsg;
+        timeoutMsg["type"] = "othello";
+        timeoutMsg["msgType"] = "timesUp"; // سرور باید این نوع پیام را مدیریت کند
+        timeoutMsg["player"] = myColor;     // اعلام اینکه زمان چه کسی تموم شده
+
+        qDebug() << timeoutMsg;
+
+        emit sendMessage(timeoutMsg);
+    }
 }
 
 void OthelloWindow::createBoard() {
@@ -193,38 +251,51 @@ void OthelloWindow::prossesMessage(QJsonObject msg)
             QString status = (currentTurn == myColor) ? "YOUR TURN!" : "Waiting for opponent...";
             this->setWindowTitle(QString("Othello [%1] - %2").arg(myColor.toUpper()).arg(status));
         }
-        else if (msgType == "endgane")
+        else if (msgType == "endgane" || msgType == "endtime")
         {
-            if (!msg.contains("board")) return; // ایمنی در برابر پیام‌های ناقص
+            // ۱. متوقف کردن تایمر کلاینت برای جلوگیری از تیک زدن اضافی
+            if (gameTimer) gameTimer->stop();
 
-            qDebug() << msg;
+            qDebug() << "Game Ended. Type:" << msgType << msg;
 
-            QJsonArray boardArray = msg["board"].toArray();
-            currentTurn = msg["currentPlayer"].toString();
-
-            for (int r = 0; r < 8; ++r) {
-                QJsonArray rowArray = boardArray[r].toArray();
-                for (int c = 0; c < 8; ++c) {
-                    int cellValue = rowArray[c].toInt();
-
-                    // 0: Empty, 1: Black, 2: White (مطابق منطق سرور)
-                    if (cellValue == 1) {
-                        updateButtonToPiece(r, c, "black");
-                    } else if (cellValue == 2) {
-                        updateButtonToPiece(r, c, "white");
-                    } else {
-                        // ریست کردن استایل برای خانه‌های خالی
-                        boardButtons[r][c]->setStyleSheet(
-                            "QPushButton { background-color: #1a9277; border: none; }"
-                            "QPushButton:hover { background-color: #147a63; }"
-                            );
+            // ۲. بروزرسانی نهایی بورد (اگر بورد در پیام فرستاده شده باشد)
+            if (msg.contains("board")) {
+                QJsonArray boardArray = msg["board"].toArray();
+                for (int r = 0; r < 8; ++r) {
+                    QJsonArray rowArray = boardArray[r].toArray();
+                    for (int c = 0; c < 8; ++c) {
+                        int cellValue = rowArray[c].toInt();
+                        if (cellValue == 1) updateButtonToPiece(r, c, "black");
+                        else if (cellValue == 2) updateButtonToPiece(r, c, "white");
                     }
                 }
             }
 
-            QString status = (msg["winner"] == myColor) ? "You Win!" : "You Lose!";
-            status = (msg["winner"] == "draw") ? "Draw" : status;
-            this->setWindowTitle(QString("Othello [%1] - %2").arg(myColor.toUpper()).arg(status));
+            // ۳. استخراج اطلاعات برنده و امتیازها
+            QString winner = msg["winner"].toString();
+            int bScore = msg["blackScore"].toInt();
+            int wScore = msg["whiteScore"].toInt();
+            QString resultText;
+
+            // ۴. شخصی‌سازی متن پیام بر اساس نوع پایان بازی
+            QString reasonText = "";
+            if (msgType == "endtime") {
+                QString loserColor = msg["color"].toString();
+                reasonText = (loserColor == myColor) ? "Your time ran out! ⌛\n" : "Opponent's time ran out! ⌛\n";
+            }
+
+            // ۵. تعیین متن وضعیت برد/باخت
+            if (winner == "draw") {
+                resultText = reasonText + QString("The game is a Draw! 🤝\nBlack: %1 - White: %2").arg(bScore).arg(wScore);
+            } else {
+                QString winStatus = (winner == myColor) ? "Victory! 🎉" : "Defeat! 🚩";
+                resultText = reasonText + QString("%1\nWinner: %2\n\nFinal Scores:\nBlack: %3 | White: %4")
+                                              .arg(winStatus).arg(winner.toUpper()).arg(bScore).arg(wScore);
+            }
+
+            // ۶. نمایش مسیج باکس و بستن پنجره
+            QMessageBox::information(this, "Game Over", resultText);
+            endGame();
         }
     }
 }

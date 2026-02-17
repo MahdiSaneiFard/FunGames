@@ -18,7 +18,7 @@ public:
     bool hasAnyValidMove(int playerColor);
     void handleMove(Client* player, const QJsonObject& move) override;
     void startGame() override;
-    void endGame();
+    void endGame(bool time, QString color);
     void broadcastGameState();
 };
 

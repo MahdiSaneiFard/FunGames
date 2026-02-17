@@ -5,6 +5,8 @@
 #include <QJsonObject>
 #include <QPushButton>
 #include <QJsonArray>
+#include <QTimer>  // اضافه شد
+#include <QLabel>
 
 namespace Ui {
 class OthelloWindow;
@@ -15,7 +17,7 @@ class OthelloWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit OthelloWindow(QWidget *parent = nullptr);
+    explicit OthelloWindow(int time, QWidget *parent = nullptr);
     void endGame();
     ~OthelloWindow();
     void setPlayerColor(QString color);
@@ -39,6 +41,14 @@ private:
     void setupInitialPieces();
     void updateButtonToPiece(int r, int c, QString color);
     bool canMoveHere(int row, int col, QString color, const QJsonArray &boardArray);
+
+    QTimer *gameTimer;
+    int remainingSec;
+    int matchTime; // زمان کل بر حسب دقیقه
+    QLabel *timerLabel;
+
+    void startTimer();
+    void updateTimer();
 };
 
 #endif // OTHELLOWINDOW_H
