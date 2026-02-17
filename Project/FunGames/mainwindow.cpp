@@ -371,6 +371,7 @@ void MainWindow::onMessageReceived(QJsonObject msg)
 
             connect(othellowindow, &OthelloWindow::othelloFinished, this, [=]() {
                 this->show();          // برگشت به لابی
+                ui->tabWidget->setCurrentIndex(0);
                 othellowindow->deleteLater();
             });
 
@@ -386,6 +387,7 @@ void MainWindow::onMessageReceived(QJsonObject msg)
 
             connect(connectFourWindow, &ConnectFourWindow::conncetFourFinished, this, [=]() {
                 this->show();          // برگشت به لابی
+                ui->tabWidget->setCurrentIndex(0);
                 connectFourWindow->deleteLater();
             });
 
@@ -408,6 +410,7 @@ void MainWindow::onMessageReceived(QJsonObject msg)
 
             connect(othellowindow, &OthelloWindow::othelloFinished, this, [=]() {
                 this->show();          // برگشت به لابی
+                ui->tabWidget->setCurrentIndex(0);
                 othellowindow->deleteLater();
             });
 
@@ -425,6 +428,7 @@ void MainWindow::onMessageReceived(QJsonObject msg)
 
             connect(connectFourWindow, &ConnectFourWindow::conncetFourFinished, this, [=]() {
                 this->show();          // برگشت به لابی
+                ui->tabWidget->setCurrentIndex(0);
                 connectFourWindow->deleteLater();
             });
 
@@ -442,31 +446,52 @@ void MainWindow::onMessageReceived(QJsonObject msg)
         for (int i = 0; i < history.size(); ++i) {
             QJsonObject game = history[i].toObject();
 
-            // ۱. استخراج داده‌ها
-            QString bUser  = game["blackUser"].toString();
-            int bScore     = game["blackScore"].toInt();
-            int wScore     = game["whiteScore"].toInt();
-            QString wUser  = game["whiteUser"].toString();
+            QString bUser = game["blackUser"].toString();
+            QString wUser = game["whiteUser"].toString();
+            int bScore = game["blackScore"].toInt();
+            int wScore = game["whiteScore"].toInt();
             QString winner = game["winner"].toString();
 
-            // ۲. ساختن متن با فرمت تراز شده
-            // استفاده از \t (تب) یا فاصله‌های منظم برای خط اول
-            QString line1 = QString("%1 : %2      VS      %3 : %4")
-                                .arg(bUser).arg(bScore).arg(wScore).arg(wUser);
-            QString line2 = QString("Winner: %1").arg(winner);
+            // تعیین رنگ‌ها بر اساس برنده
+            // اگر مساوی باشد هر دو سفید، اگر سیاه برده باشد سیاه سبز و سفید قرمز (یا خاکستری)
+            QString bColor = "#FFFFFF"; // پیش‌فرض سفید
+            QString wColor = "#FFFFFF";
 
-            QString finalFullText = line1 + "\n" + line2;
+            if (winner == bUser) {
+                bColor = "#00FF00"; // سبز برای برنده
+                wColor = "#FF4444"; // قرمز برای بازنده
+            } else if (winner == wUser) {
+                wColor = "#00FF00";
+                bColor = "#FF4444";
+            }
 
-            // ۳. ایجاد آیتم و تنظیم تراز وسط
-            QListWidgetItem* item = new QListWidgetItem(finalFullText);
+            QString htmlText = QString(
+                                   "<div style='margin: 5px;'>"
+                                   "  <div style='font-size: 15px; font-family: Segoe UI;'>"
+                                   // نام بازیکن سیاه با رنگ متغیر (bColor) - امتیاز با رنگ ثابت سفید (#FFFFFF)
+                                   "    <b style='color: %1;'>%2</b> : <span style='color: #FFFFFF;'>%3</span>"
+                                   "    &nbsp;&nbsp;&nbsp; <span style='color: #55FFFF; font-weight: bold;'>VS</span> &nbsp;&nbsp;&nbsp;"
+                                   // امتیاز بازیکن سفید با رنگ ثابت سفید - نام بازیکن با رنگ متغیر (wColor)
+                                   "    <span style='color: #FFFFFF;'>%4</span> : <b style='color: %5;'>%6</b>"
+                                   "  </div>"
+                                   "  <div style='margin-top: 10px; color: #AAAAAA; font-size: 13px;'>"
+                                   "    🏆 Winner: <b style='color: #FFD700;'>%7</b>"
+                                   "  </div>"
+                                   "</div>"
+                                   ).arg(bColor).arg(bUser).arg(bScore)
+                                   .arg(wScore).arg(wColor).arg(wUser) // دقت کن که جای wScore و wColor را در arg جابجا کردیم تا با فرمت بالا بخورد
+                                   .arg(winner);
 
-            // این خط باعث می‌شود متن در کل عرض کادر وسط‌چین شود
-            item->setTextAlignment(Qt::AlignCenter);
-
-            // تنظیم فونت برای خوانایی بهتر (اختیاری)
-            item->setFont(QFont("Segoe UI", 10, QFont::Bold));
-
+            // باقی مراحل اضافه کردن به ListWidget...
+            QListWidgetItem* item = new QListWidgetItem();
             ui->listWidget_3->addItem(item);
+
+            QLabel* label = new QLabel(htmlText);
+            label->setStyleSheet("background: transparent;");
+            label->setAlignment(Qt::AlignCenter);
+
+            item->setSizeHint(QSize(label->sizeHint().width(), 80)); // ارتفاع ثابت برای هر کارت
+            ui->listWidget_3->setItemWidget(item, label);
         }
     }
     else if(type == "othello")
