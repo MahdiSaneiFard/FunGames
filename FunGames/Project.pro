@@ -40,7 +40,7 @@ FORMS += \
 
 # for Email validation
 
-INCLUDEPATH += $$PWD/smtp/src
+INCLUDEPATH += $$PWD/libs/smtp/src
 SOURCES += $$files($$PWD/smtp/src/*.cpp)
 HEADERS += $$files($$PWD/smtp/src/*.h) \
            $$PWD/smtp/src/SmtpMime
