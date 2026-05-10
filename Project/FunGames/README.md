@@ -1,2 +1,3 @@
-tuen off msys options
-and tuen the mingw release and debug on
+## How to use
+turn off msys options
+and turn the mingw release and debug on
